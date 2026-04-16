@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 图片评审工作台原型预览</title>
+  <link rel="stylesheet" href="./prototype.css" />
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div>
+          <h1>AI 图片筛选与评审工作台</h1>
+          <p class="muted">基于设计文档整理的静态原型预览入口</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="chip">浅色工作台</span>
+        <span class="chip">桌面端布局</span>
+        <span class="chip primary">4 个核心页面</span>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="panel panel-pad">
+        <p class="muted">原型目标</p>
+        <h2 class="hero-title">先把“工作流感”看出来，再继续细修视觉和交互。</h2>
+        <p class="hero-copy">
+          这一版原型重点呈现项目书架、三栏审核、维度筛选和结果沉淀四个核心场景，
+          方便你快速判断布局、信息密度和操作节奏是否对。
+        </p>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <span class="muted">项目入口</span>
+            <strong>首页书架</strong>
+          </div>
+          <div class="stat-card">
+            <span class="muted">核心工作台</span>
+            <strong>三栏审核</strong>
+          </div>
+          <div class="stat-card">
+            <span class="muted">结果整理</span>
+            <strong>筛选 + 总结</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="section-title">
+          <h3>预览说明</h3>
+          <span class="status"><span class="dot"></span>静态 HTML</span>
+        </div>
+        <div class="note-box">
+          这些页面都是为了看结构和视觉节奏，不包含真实交互逻辑。
+          你先挑风格、层级、布局和信息组织，有需要我再继续改成更像最终产品的版本。
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel-pad">
+      <div class="section-title">
+        <h2>页面列表</h2>
+        <span class="muted">建议按工作流顺序查看</span>
+      </div>
+      <div class="prototype-list">
+        <article class="prototype-entry">
+          <h3>1. 首页 / 项目书架</h3>
+          <p>展示新建项目卡、历史项目书架、项目进度和状态标签，强调“项目管理入口”而不是文件浏览器。</p>
+          <a class="button primary" href="./prototype-home.html">打开首页原型</a>
+        </article>
+
+        <article class="prototype-entry">
+          <h3>2. 审核页 / 三栏工作台</h3>
+          <p>左侧缩略图，中间大图，右侧评审面板，重点看审核状态、标签、维度评分和备注的组织方式。</p>
+          <a class="button primary" href="./prototype-review.html">打开审核原型</a>
+        </article>
+
+        <article class="prototype-entry">
+          <h3>3. 筛选页 / 结果分析台</h3>
+          <p>用固定筛选面板 + 结果网格 + 快速预览的结构，体现“基于评审信息的二次组织”。</p>
+          <a class="button primary" href="./prototype-filter.html">打开筛选原型</a>
+        </article>
+
+        <article class="prototype-entry">
+          <h3>4. 结果页 / 结论沉淀</h3>
+          <p>先给结论，再给统计和导出能力，突出评审完成后的交付视角。</p>
+          <a class="button primary" href="./prototype-result.html">打开结果原型</a>
+        </article>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
