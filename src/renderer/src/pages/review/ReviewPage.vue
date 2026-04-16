@@ -21,11 +21,12 @@
           <h2>图片列表</h2>
           <span class="section-tip">批量浏览与快速切换</span>
         </div>
-        <div class="thumb-list">
+        <div ref="thumbListRef" class="thumb-list">
           <button
             v-for="item in reviewItems"
             :key="item.asset.id"
             class="thumb-row"
+            :data-asset-id="item.asset.id"
             :class="{ active: item.asset.id === assetStore.currentAssetId }"
             @click="assetStore.selectAsset(item.asset.id)"
           >
@@ -120,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue'
+import { computed, nextTick, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import {
@@ -140,6 +141,7 @@ const router = useRouter()
 const projectStore = useProjectStore()
 const assetStore = useAssetStore()
 const reviewStore = useReviewStore()
+const thumbListRef = ref<HTMLElement | null>(null)
 
 const projectAssets = computed(() =>
   assetStore.assets.filter((asset) => asset.projectId === projectStore.currentProjectId)
@@ -189,6 +191,18 @@ const primaryActionText = computed(() => {
 })
 
 const isNextDisabled = computed(() => isLastAsset.value && !isAllReviewed.value)
+
+watch(
+  () => assetStore.currentAssetId,
+  async (assetId) => {
+    if (!assetId) return
+    await nextTick()
+    const list = thumbListRef.value
+    if (!list) return
+    const row = list.querySelector<HTMLElement>(`[data-asset-id="${assetId}"]`)
+    row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }
+)
 
 watchEffect(() => {
   const routeProjectId = String(route.params.projectId || '')

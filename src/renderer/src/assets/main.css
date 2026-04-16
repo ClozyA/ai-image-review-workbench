@@ -195,11 +195,20 @@ body {
   background: #fff;
   cursor: pointer;
   text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.thumb-row:hover {
+  border-color: rgba(47, 107, 255, 0.22);
 }
 
 .thumb-row.active {
-  border-color: rgba(47, 107, 255, 0.35);
-  box-shadow: 0 12px 28px rgba(47, 107, 255, 0.12);
+  border-color: #2f6bff;
+  background: rgba(47, 107, 255, 0.08);
+}
+
+.thumb-row.active .thumb-meta strong {
+  color: #1b4fd8;
 }
 
 .thumb-list {
@@ -207,6 +216,8 @@ body {
   min-height: 0;
   overflow-y: auto;
   padding-right: 4px;
+  align-content: start;
+  grid-auto-rows: max-content;
 }
 
 .thumb-box {
@@ -251,7 +262,7 @@ body {
   border: 2px solid rgba(22, 39, 69, 0.08);
   border-radius: 14px;
   background: #fff;
-  margin-bottom: 5px;
+  margin-bottom: 12px;
 }
 
 .meta-card span {
@@ -298,6 +309,7 @@ body {
   grid-template-columns: 1fr 2fr;
   gap: 12px;
   margin-top: 16px;
+  margin-bottom: 12px;
 }
 
 .result-list {
