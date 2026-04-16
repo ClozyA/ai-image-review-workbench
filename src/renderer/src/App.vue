@@ -1,26 +1,16 @@
-<script setup lang="ts">
-import Versions from './components/Versions.vue'
-
-const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-</script>
-
 <template>
-  <img alt="logo" class="logo" src="./assets/electron.svg" />
-  <div class="creator">Powered by electron-vite</div>
-  <div class="text">
-    Build an Electron app with
-    <span class="vue">Vue</span>
-    and
-    <span class="ts">TypeScript</span>
+  <div style="padding: 24px">
+    <a-space direction="vertical" size="large">
+      <a-typography-title :level="2"> AI 图片筛选与评审工作台 </a-typography-title>
+
+      <a-alert message="Electron + Vue + Ant Design Vue 已接入" type="success" show-icon />
+
+      <a-space>
+        <a-button type="primary">新建项目</a-button>
+        <a-button>打开项目</a-button>
+      </a-space>
+    </a-space>
   </div>
-  <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-  <div class="actions">
-    <div class="action">
-      <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
-    </div>
-    <div class="action">
-      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>
-    </div>
-  </div>
-  <Versions />
 </template>
+
+<script setup lang="ts"></script>
