@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import { mockAssets } from '@renderer/app/mocks/review.mock'
-import type { AssetId, ImageAsset } from '@renderer/app/types/review'
+import type { AssetId, ImageAsset, ReviewProjectSnapshot } from '@renderer/app/types/review'
 
 export const useAssetStore = defineStore('asset', () => {
   const assets = ref<ImageAsset[]>(mockAssets)
@@ -29,12 +29,19 @@ export const useAssetStore = defineStore('asset', () => {
     currentAssetId.value = assets.value[index - 1].id
   }
 
+  function replaceBySnapshot(snapshot: ReviewProjectSnapshot): void {
+    const otherAssets = assets.value.filter((asset) => asset.projectId !== snapshot.project.id)
+    assets.value = [...otherAssets, ...snapshot.assets]
+    currentAssetId.value = snapshot.assets[0]?.id ?? ''
+  }
+
   return {
     assets,
     currentAssetId,
     currentAsset,
     selectAsset,
     selectNextAsset,
-    selectPreviousAsset
+    selectPreviousAsset,
+    replaceBySnapshot
   }
 })

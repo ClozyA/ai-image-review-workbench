@@ -2,13 +2,21 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import { mockReviews } from '@renderer/app/mocks/review.mock'
+import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
-import type { AssetCategory, AssetId, AssetReview, ReviewDecision } from '@renderer/app/types/review'
+import type {
+  AssetCategory,
+  AssetId,
+  AssetReview,
+  ReviewDecision,
+  ReviewProjectSnapshot
+} from '@renderer/app/types/review'
 
 export const useReviewStore = defineStore('review', () => {
   const reviews = ref<AssetReview[]>(mockReviews)
   const saveStatus = ref<'idle' | 'saving' | 'saved'>('saved')
 
+  const assetStore = useAssetStore()
   const projectStore = useProjectStore()
 
   const reviewsByCurrentProject = computed(() =>
@@ -27,7 +35,7 @@ export const useReviewStore = defineStore('review', () => {
     target.updatedAt = new Date().toISOString()
     if (decision !== 'unreviewed') target.reviewedAt = target.updatedAt
     saveStatus.value = 'saved'
-    projectStore.refreshSummary(target.projectId)
+    refreshProjectSummary(target.projectId)
   }
 
   function updateCategory(assetId: AssetId, category: AssetCategory): void {
@@ -37,7 +45,7 @@ export const useReviewStore = defineStore('review', () => {
     target.category = category
     target.updatedAt = new Date().toISOString()
     saveStatus.value = 'saved'
-    projectStore.refreshSummary(target.projectId)
+    refreshProjectSummary(target.projectId)
   }
 
   function updateComment(assetId: AssetId, comment: string): void {
@@ -47,7 +55,20 @@ export const useReviewStore = defineStore('review', () => {
     target.comment = comment
     target.updatedAt = new Date().toISOString()
     saveStatus.value = 'saved'
-    projectStore.refreshSummary(target.projectId)
+    refreshProjectSummary(target.projectId)
+  }
+
+  function replaceBySnapshot(snapshot: ReviewProjectSnapshot): void {
+    const otherReviews = reviews.value.filter((review) => review.projectId !== snapshot.project.id)
+    reviews.value = [...otherReviews, ...snapshot.reviews]
+    saveStatus.value = 'saved'
+    projectStore.refreshSummary(snapshot.project.id, snapshot.assets, snapshot.reviews)
+  }
+
+  function refreshProjectSummary(projectId: string): void {
+    const projectAssets = assetStore.assets.filter((asset) => asset.projectId === projectId)
+    const projectReviews = reviews.value.filter((review) => review.projectId === projectId)
+    projectStore.refreshSummary(projectId, projectAssets, projectReviews)
   }
 
   return {
@@ -57,6 +78,7 @@ export const useReviewStore = defineStore('review', () => {
     getReviewByAssetId,
     updateDecision,
     updateCategory,
-    updateComment
+    updateComment,
+    replaceBySnapshot
   }
 })

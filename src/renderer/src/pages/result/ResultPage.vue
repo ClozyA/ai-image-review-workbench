@@ -68,14 +68,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { ASSET_CATEGORY_OPTIONS } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
 
+const route = useRoute()
 const router = useRouter()
 const assetStore = useAssetStore()
 const projectStore = useProjectStore()
@@ -92,6 +93,13 @@ const commentedItems = computed(() =>
     }))
     .filter((item) => item.review.comment.trim())
 )
+
+watchEffect(() => {
+  const routeProjectId = String(route.params.projectId || '')
+  if (routeProjectId && routeProjectId !== projectStore.currentProjectId) {
+    projectStore.selectProject(routeProjectId)
+  }
+})
 
 function goFilter(): void {
   router.push({ name: 'filter', params: { projectId: projectStore.currentProjectId } })

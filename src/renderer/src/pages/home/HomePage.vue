@@ -6,7 +6,7 @@
         <p class="page-subtitle">基础骨架已就位，后续页面将围绕统一模型持续落地。</p>
       </div>
       <a-space>
-        <a-button type="primary">打开文件夹</a-button>
+        <a-button type="primary" :loading="opening" @click="openFolder">打开文件夹</a-button>
         <a-button>导入结果</a-button>
       </a-space>
     </header>
@@ -55,12 +55,20 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 import { useProjectStore } from '@renderer/app/store/project.store'
+import { useAssetStore } from '@renderer/app/store/asset.store'
+import { useReviewStore } from '@renderer/app/store/review.store'
+import type { ReviewProjectSnapshot } from '@renderer/app/types/review'
 
 const router = useRouter()
 const projectStore = useProjectStore()
+const assetStore = useAssetStore()
+const reviewStore = useReviewStore()
+const opening = ref(false)
 
 function goReview(projectId: string): void {
   projectStore.selectProject(projectId)
@@ -70,5 +78,23 @@ function goReview(projectId: string): void {
 function formatDate(value?: string): string {
   if (!value) return '未打开'
   return new Date(value).toLocaleString('zh-CN')
+}
+
+async function openFolder(): Promise<void> {
+  opening.value = true
+  try {
+    const snapshot = (await window.api.openProjectFolder()) as ReviewProjectSnapshot | null
+    if (!snapshot) return
+    projectStore.upsertProject(snapshot)
+    assetStore.replaceBySnapshot(snapshot)
+    reviewStore.replaceBySnapshot(snapshot)
+    await router.push({ name: 'review', params: { projectId: snapshot.project.id } })
+    message.success(`已导入项目：${snapshot.project.name}`)
+  } catch (error) {
+    console.error(error)
+    message.error('打开文件夹失败，请稍后重试')
+  } finally {
+    opening.value = false
+  }
 }
 </script>

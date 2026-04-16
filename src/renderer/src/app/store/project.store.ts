@@ -3,12 +3,17 @@ import { defineStore } from 'pinia'
 
 import { EMPTY_PROJECT_SUMMARY } from '@renderer/app/constants/review'
 import { mockAssets, mockProjects, mockReviews } from '@renderer/app/mocks/review.mock'
-import type { AssetCategory, ProjectId, ProjectSummary, ReviewProject } from '@renderer/app/types/review'
+import type {
+  AssetCategory,
+  AssetReview,
+  ImageAsset,
+  ProjectId,
+  ProjectSummary,
+  ReviewProject,
+  ReviewProjectSnapshot
+} from '@renderer/app/types/review'
 
-function buildSummary(projectId: ProjectId): ProjectSummary {
-  const projectAssets = mockAssets.filter((asset) => asset.projectId === projectId)
-  const projectReviews = mockReviews.filter((review) => review.projectId === projectId)
-
+function buildSummary(projectAssets: ImageAsset[], projectReviews: AssetReview[]): ProjectSummary {
   const summary: ProjectSummary = {
     ...EMPTY_PROJECT_SUMMARY,
     categoryCounts: { ...EMPTY_PROJECT_SUMMARY.categoryCounts }
@@ -33,7 +38,15 @@ export const useProjectStore = defineStore('project', () => {
   const currentProjectId = ref<ProjectId>(mockProjects[0]?.id ?? '')
 
   const summaries = ref<Record<ProjectId, ProjectSummary>>(
-    Object.fromEntries(mockProjects.map((project) => [project.id, buildSummary(project.id)]))
+    Object.fromEntries(
+      mockProjects.map((project) => [
+        project.id,
+        buildSummary(
+          mockAssets.filter((asset) => asset.projectId === project.id),
+          mockReviews.filter((review) => review.projectId === project.id)
+        )
+      ])
+    )
   )
 
   const currentProject = computed(
@@ -48,8 +61,19 @@ export const useProjectStore = defineStore('project', () => {
     currentProjectId.value = projectId
   }
 
-  function refreshSummary(projectId: ProjectId): void {
-    summaries.value[projectId] = buildSummary(projectId)
+  function refreshSummary(projectId: ProjectId, assets: ImageAsset[], reviews: AssetReview[]): void {
+    summaries.value[projectId] = buildSummary(assets, reviews)
+  }
+
+  function upsertProject(snapshot: ReviewProjectSnapshot): void {
+    const index = projects.value.findIndex((project) => project.id === snapshot.project.id)
+    if (index >= 0) {
+      projects.value[index] = snapshot.project
+    } else {
+      projects.value = [snapshot.project, ...projects.value]
+    }
+    currentProjectId.value = snapshot.project.id
+    refreshSummary(snapshot.project.id, snapshot.assets, snapshot.reviews)
   }
 
   return {
@@ -59,6 +83,7 @@ export const useProjectStore = defineStore('project', () => {
     currentProject,
     currentSummary,
     selectProject,
-    refreshSummary
+    refreshSummary,
+    upsertProject
   }
 })

@@ -115,8 +115,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import {
   ASSET_CATEGORY_OPTIONS,
@@ -129,6 +129,7 @@ import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
 import type { AssetCategory, AssetViewModel, ReviewDecision } from '@renderer/app/types/review'
 
+const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
 const assetStore = useAssetStore()
@@ -170,6 +171,13 @@ const saveStatusText = computed(() => {
   if (reviewStore.saveStatus === 'saving') return '保存中'
   if (reviewStore.saveStatus === 'saved') return '已保存'
   return '未保存'
+})
+
+watchEffect(() => {
+  const routeProjectId = String(route.params.projectId || '')
+  if (routeProjectId && routeProjectId !== projectStore.currentProjectId) {
+    projectStore.selectProject(routeProjectId)
+  }
 })
 
 function updateDecision(value: ReviewDecision): void {

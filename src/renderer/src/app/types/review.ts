@@ -70,3 +70,9 @@ export interface ReviewFilter {
   hasComment?: boolean
   keyword: string
 }
+
+export interface ReviewProjectSnapshot {
+  project: ReviewProject
+  assets: ImageAsset[]
+  reviews: AssetReview[]
+}
