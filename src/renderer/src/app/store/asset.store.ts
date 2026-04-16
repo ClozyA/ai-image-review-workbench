@@ -35,6 +35,11 @@ export const useAssetStore = defineStore('asset', () => {
     currentAssetId.value = snapshot.assets[0]?.id ?? ''
   }
 
+  function replaceBySnapshots(snapshots: ReviewProjectSnapshot[]): void {
+    assets.value = snapshots.flatMap((snapshot) => snapshot.assets)
+    currentAssetId.value = snapshots[0]?.assets[0]?.id ?? ''
+  }
+
   return {
     assets,
     currentAssetId,
@@ -42,6 +47,7 @@ export const useAssetStore = defineStore('asset', () => {
     selectAsset,
     selectNextAsset,
     selectPreviousAsset,
-    replaceBySnapshot
+    replaceBySnapshot,
+    replaceBySnapshots
   }
 })

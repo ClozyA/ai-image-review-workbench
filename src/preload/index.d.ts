@@ -37,6 +37,8 @@ interface ReviewProjectSnapshot {
 
 interface RendererApi {
   openProjectFolder: () => Promise<ReviewProjectSnapshot | null>
+  listProjectSnapshots: () => Promise<ReviewProjectSnapshot[]>
+  saveProjectSnapshot: (snapshot: ReviewProjectSnapshot) => Promise<boolean>
 }
 
 declare global {

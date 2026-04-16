@@ -2,7 +2,9 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
-  openProjectFolder: () => ipcRenderer.invoke('project:open-folder')
+  openProjectFolder: () => ipcRenderer.invoke('project:open-folder'),
+  listProjectSnapshots: () => ipcRenderer.invoke('project:list-snapshots'),
+  saveProjectSnapshot: (snapshot) => ipcRenderer.invoke('project:save-snapshot', snapshot)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

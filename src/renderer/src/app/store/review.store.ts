@@ -36,6 +36,7 @@ export const useReviewStore = defineStore('review', () => {
     if (decision !== 'unreviewed') target.reviewedAt = target.updatedAt
     saveStatus.value = 'saved'
     refreshProjectSummary(target.projectId)
+    void persistProject(target.projectId)
   }
 
   function updateCategory(assetId: AssetId, category: AssetCategory): void {
@@ -46,6 +47,7 @@ export const useReviewStore = defineStore('review', () => {
     target.updatedAt = new Date().toISOString()
     saveStatus.value = 'saved'
     refreshProjectSummary(target.projectId)
+    void persistProject(target.projectId)
   }
 
   function updateComment(assetId: AssetId, comment: string): void {
@@ -56,6 +58,7 @@ export const useReviewStore = defineStore('review', () => {
     target.updatedAt = new Date().toISOString()
     saveStatus.value = 'saved'
     refreshProjectSummary(target.projectId)
+    void persistProject(target.projectId)
   }
 
   function replaceBySnapshot(snapshot: ReviewProjectSnapshot): void {
@@ -65,10 +68,34 @@ export const useReviewStore = defineStore('review', () => {
     projectStore.refreshSummary(snapshot.project.id, snapshot.assets, snapshot.reviews)
   }
 
+  function replaceBySnapshots(snapshots: ReviewProjectSnapshot[]): void {
+    reviews.value = snapshots.flatMap((snapshot) => snapshot.reviews)
+    saveStatus.value = 'saved'
+  }
+
   function refreshProjectSummary(projectId: string): void {
     const projectAssets = assetStore.assets.filter((asset) => asset.projectId === projectId)
     const projectReviews = reviews.value.filter((review) => review.projectId === projectId)
     projectStore.refreshSummary(projectId, projectAssets, projectReviews)
+  }
+
+  async function persistProject(projectId: string): Promise<void> {
+    const project = projectStore.projects.find((item) => item.id === projectId)
+    if (!project) return
+    const assets = assetStore.assets.filter((asset) => asset.projectId === projectId)
+    const projectReviews = reviews.value.filter((review) => review.projectId === projectId)
+    const now = new Date().toISOString()
+    project.updatedAt = now
+    project.lastOpenedAt = now
+    project.assetCount = assets.length
+
+    await window.api.saveProjectSnapshot({
+      project: {
+        ...project
+      },
+      assets,
+      reviews: projectReviews
+    })
   }
 
   return {
@@ -79,6 +106,9 @@ export const useReviewStore = defineStore('review', () => {
     updateDecision,
     updateCategory,
     updateComment,
-    replaceBySnapshot
+    replaceBySnapshot,
+    replaceBySnapshots,
+    refreshProjectSummary,
+    persistProject
   }
 })

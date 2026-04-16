@@ -76,6 +76,17 @@ export const useProjectStore = defineStore('project', () => {
     refreshSummary(snapshot.project.id, snapshot.assets, snapshot.reviews)
   }
 
+  function replaceBySnapshots(snapshots: ReviewProjectSnapshot[]): void {
+    projects.value = snapshots.map((snapshot) => snapshot.project)
+    summaries.value = Object.fromEntries(
+      snapshots.map((snapshot) => [
+        snapshot.project.id,
+        buildSummary(snapshot.assets, snapshot.reviews)
+      ])
+    )
+    currentProjectId.value = snapshots[0]?.project.id ?? ''
+  }
+
   return {
     projects,
     currentProjectId,
@@ -84,6 +95,7 @@ export const useProjectStore = defineStore('project', () => {
     currentSummary,
     selectProject,
     refreshSummary,
-    upsertProject
+    upsertProject,
+    replaceBySnapshots
   }
 })

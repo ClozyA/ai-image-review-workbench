@@ -2,13 +2,16 @@ import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { createProjectSnapshotFromFolder } from './project-scanner'
+import { createProjectSnapshotFromFolder, type ReviewProjectSnapshot } from './project-scanner'
+import { ProjectRepository } from './project-repository'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1600,
+    height: 1000,
+    minWidth: 1600,
+    minHeight: 1000,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -36,6 +39,8 @@ function createWindow(): void {
   }
 }
 
+const projectRepository = new ProjectRepository(join(app.getPath('userData'), 'projects'))
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -59,7 +64,18 @@ app.whenReady().then(() => {
       return null
     }
 
-    return createProjectSnapshotFromFolder(result.filePaths[0])
+    const snapshot = await createProjectSnapshotFromFolder(result.filePaths[0])
+    await projectRepository.saveSnapshot(snapshot)
+    return snapshot
+  })
+
+  ipcMain.handle('project:list-snapshots', async () => {
+    return projectRepository.listSnapshots()
+  })
+
+  ipcMain.handle('project:save-snapshot', async (_, snapshot: ReviewProjectSnapshot) => {
+    await projectRepository.saveSnapshot(snapshot)
+    return true
   })
 
   createWindow()
