@@ -19,24 +19,27 @@
         </div>
 
         <div class="project-grid">
-          <article class="project-tile project-tile-add">
+          <article class="project-tile project-tile-add" @click="openFolder">
             <div class="project-tile-mark">+</div>
             <strong>新建项目</strong>
             <span>从图片文件夹创建项目</span>
           </article>
 
-          <article
-            v-for="project in projectStore.projects"
-            :key="project.id"
-            class="project-tile"
-          >
+          <article v-for="project in projectStore.projects" :key="project.id" class="project-tile">
             <div class="project-tile-top" @click="goReview(project.id)">
-              <img class="project-cover" :src="getProjectCover(project.id, project.coverAssetId)" alt="" />
+              <img
+                class="project-cover"
+                :src="getProjectCover(project.id, project.coverAssetId)"
+                alt=""
+              />
               <strong>{{ project.name }}</strong>
               <span>{{ project.assetCount }} 张图片</span>
               <span class="section-tip">最近打开：{{ formatDate(project.lastOpenedAt) }}</span>
             </div>
-            <a-button danger @click.stop="removeProject(project.id)">从书架移除</a-button>
+            <a-space>
+              <a-button @click.stop="renameProject(project.id)">重命名项目</a-button>
+              <a-button danger @click.stop="removeProject(project.id)">从书架移除</a-button>
+            </a-space>
           </article>
         </div>
       </div>
@@ -54,12 +57,27 @@
       </div>
     </main>
   </div>
+  <a-modal
+    v-model:open="renameModalOpen"
+    title="重命名项目"
+    ok-text="确定"
+    cancel-text="取消"
+    @ok="handleRenameConfirm"
+    @cancel="handleRenameCancel"
+  >
+    <a-input
+      v-model:value="renameInput"
+      placeholder="请输入新的项目名称"
+      :maxlength="100"
+      @pressEnter="handleRenameConfirm"
+    />
+  </a-modal>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useAssetStore } from '@renderer/app/store/asset.store'
@@ -73,6 +91,10 @@ const assetStore = useAssetStore()
 const reviewStore = useReviewStore()
 const opening = ref(false)
 
+const renameModalOpen = ref(false)
+const renameInput = ref('')
+const renamingProjectId = ref<string | null>(null)
+
 function goReview(projectId: string): void {
   projectStore.selectProject(projectId)
   router.push({ name: 'review', params: { projectId } })
@@ -81,6 +103,20 @@ function goReview(projectId: string): void {
 function formatDate(value?: string): string {
   if (!value) return '未打开'
   return new Date(value).toLocaleString('zh-CN')
+}
+
+function isNoImagesFoundError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('NO_IMAGES_FOUND')
+  }
+  if (typeof error === 'string') {
+    return error.includes('NO_IMAGES_FOUND')
+  }
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message
+    return typeof message === 'string' && message.includes('NO_IMAGES_FOUND')
+  }
+  return false
 }
 
 async function openFolder(): Promise<void> {
@@ -95,6 +131,13 @@ async function openFolder(): Promise<void> {
     message.success(`已导入项目：${snapshot.project.name}`)
   } catch (error) {
     console.error(error)
+    if (isNoImagesFoundError(error)) {
+      Modal.error({
+        title: '文件夹中没有可用图片',
+        content: '请选择包含 jpg、jpeg、png、webp、bmp 或 gif 图片的文件夹。'
+      })
+      return
+    }
     message.error('打开文件夹失败，请稍后重试')
   } finally {
     opening.value = false
@@ -119,5 +162,77 @@ async function removeProject(projectId: string): Promise<void> {
     console.error(error)
     message.error('移除项目失败，请稍后重试')
   }
+}
+
+function renameProject(projectId: string): void {
+  const project = projectStore.projects.find((item) => item.id === projectId)
+  if (!project) return
+
+  renamingProjectId.value = projectId
+  renameInput.value = project.name
+  renameModalOpen.value = true
+}
+
+async function handleRenameConfirm(): Promise<void> {
+  const projectId = renamingProjectId.value
+  if (!projectId) return
+
+  const project = projectStore.projects.find((item) => item.id === projectId)
+  if (!project) {
+    renameModalOpen.value = false
+    renamingProjectId.value = null
+    renameInput.value = ''
+    return
+  }
+
+  const nextName = renameInput.value.trim()
+  if (!nextName) {
+    message.warning('项目名称不能为空')
+    return
+  }
+
+  if (nextName === project.name) {
+    renameModalOpen.value = false
+    renamingProjectId.value = null
+    renameInput.value = ''
+    return
+  }
+
+  try {
+    project.name = nextName
+    project.updatedAt = new Date().toISOString()
+
+    // Electron IPC uses structured clone, so send plain objects instead of Vue proxies.
+    const assets = assetStore.assets
+      .filter((asset) => asset.projectId === projectId)
+      .map((asset) => ({ ...asset }))
+    const reviews = reviewStore.reviews
+      .filter((review) => review.projectId === projectId)
+      .map((review) => ({ ...review }))
+
+    await window.api.saveProjectSnapshot({
+      project: {
+        ...project,
+        assetCount: assets.length,
+        lastOpenedAt: new Date().toISOString()
+      },
+      assets,
+      reviews
+    })
+
+    message.success('项目名称已更新')
+    renameModalOpen.value = false
+    renamingProjectId.value = null
+    renameInput.value = ''
+  } catch (error) {
+    console.error(error)
+    message.error('重命名项目失败，请稍后重试')
+  }
+}
+
+function handleRenameCancel(): void {
+  renameModalOpen.value = false
+  renamingProjectId.value = null
+  renameInput.value = ''
 }
 </script>

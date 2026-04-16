@@ -86,8 +86,12 @@ export const useReviewStore = defineStore('review', () => {
   async function persistProject(projectId: string): Promise<void> {
     const project = projectStore.projects.find((item) => item.id === projectId)
     if (!project) return
-    const assets = assetStore.assets.filter((asset) => asset.projectId === projectId)
-    const projectReviews = reviews.value.filter((review) => review.projectId === projectId)
+    const assets = assetStore.assets
+      .filter((asset) => asset.projectId === projectId)
+      .map((asset) => ({ ...asset }))
+    const projectReviews = reviews.value
+      .filter((review) => review.projectId === projectId)
+      .map((review) => ({ ...review }))
     const now = new Date().toISOString()
     project.updatedAt = now
     project.lastOpenedAt = now

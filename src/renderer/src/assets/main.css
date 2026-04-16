@@ -97,6 +97,13 @@ body {
   cursor: pointer;
 }
 
+.project-tile strong {
+  font-size: 15px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .project-tile-top {
   display: grid;
   gap: 10px;
@@ -215,7 +222,8 @@ body {
 }
 
 .thumb-meta strong {
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.35;
   overflow-wrap: anywhere;
   word-break: break-word;
 }

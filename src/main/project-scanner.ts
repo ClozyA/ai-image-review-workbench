@@ -65,6 +65,10 @@ export async function createProjectSnapshotFromFolder(
     .filter((entry) => SUPPORTED_IMAGE_EXTENSIONS.has(extname(entry.name).toLowerCase()))
     .sort((left, right) => left.name.localeCompare(right.name, 'zh-CN'))
 
+  if (!files.length) {
+    throw new Error('NO_IMAGES_FOUND')
+  }
+
   const assets: ReviewProjectSnapshot['assets'] = []
   const thumbnailDir = join(thumbnailBaseDir, projectId)
   await mkdir(thumbnailDir, { recursive: true })
