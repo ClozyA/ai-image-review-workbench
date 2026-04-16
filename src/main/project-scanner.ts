@@ -1,6 +1,6 @@
 import { nativeImage } from 'electron'
 import { basename, extname, join } from 'path'
-import { readdir, stat } from 'fs/promises'
+import { access, mkdir, readdir, stat, writeFile } from 'fs/promises'
 import { randomUUID } from 'crypto'
 
 type ProjectId = string
@@ -53,7 +53,8 @@ const SUPPORTED_IMAGE_EXTENSIONS = new Set([
 ])
 
 export async function createProjectSnapshotFromFolder(
-  folderPath: string
+  folderPath: string,
+  thumbnailBaseDir: string
 ): Promise<ReviewProjectSnapshot> {
   const entries = await readdir(folderPath, { withFileTypes: true })
   const now = new Date().toISOString()
@@ -65,14 +66,18 @@ export async function createProjectSnapshotFromFolder(
     .sort((left, right) => left.name.localeCompare(right.name, 'zh-CN'))
 
   const assets: ReviewProjectSnapshot['assets'] = []
+  const thumbnailDir = join(thumbnailBaseDir, projectId)
+  await mkdir(thumbnailDir, { recursive: true })
 
   for (const file of files) {
     const filePath = join(folderPath, file.name)
     const fileStat = await stat(filePath)
     const size = readImageSize(filePath)
+    const assetId = randomUUID()
+    const thumbnailPath = await ensureThumbnail(filePath, thumbnailDir, assetId)
 
     assets.push({
-      id: randomUUID(),
+      id: assetId,
       projectId,
       filePath,
       fileName: file.name,
@@ -80,7 +85,8 @@ export async function createProjectSnapshotFromFolder(
       width: size.width,
       height: size.height,
       createdAt: fileStat.birthtime?.toISOString(),
-      modifiedAt: fileStat.mtime?.toISOString()
+      modifiedAt: fileStat.mtime?.toISOString(),
+      thumbnailPath
     })
   }
 
@@ -106,6 +112,38 @@ export async function createProjectSnapshotFromFolder(
     },
     assets,
     reviews
+  }
+}
+
+async function ensureThumbnail(
+  filePath: string,
+  thumbnailDir: string,
+  assetId: string
+): Promise<string | undefined> {
+  const targetPath = join(thumbnailDir, `${assetId}.png`)
+
+  try {
+    await access(targetPath)
+    return targetPath
+  } catch {
+    // 缩略图不存在时继续生成
+  }
+
+  try {
+    const image = nativeImage.createFromPath(filePath)
+    if (image.isEmpty()) return undefined
+
+    const thumbnail = image.resize({
+      width: 256,
+      height: 256,
+      quality: 'good'
+    })
+
+    await writeFile(targetPath, thumbnail.toPNG())
+    return targetPath
+  } catch (error) {
+    console.error(`生成缩略图失败: ${filePath}`, error)
+    return undefined
   }
 }
 

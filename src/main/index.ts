@@ -1,5 +1,6 @@
-import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, dialog, ipcMain, net, protocol } from 'electron'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createProjectSnapshotFromFolder, type ReviewProjectSnapshot } from './project-scanner'
@@ -39,12 +40,19 @@ function createWindow(): void {
   }
 }
 
-const projectRepository = new ProjectRepository(join(app.getPath('userData'), 'projects'))
+const userDataDir = app.getPath('userData')
+const projectRepository = new ProjectRepository(join(userDataDir, 'projects'))
+const thumbnailBaseDir = join(userDataDir, 'thumbnails')
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  protocol.handle('local-image', (request) => {
+    const filePath = decodeURIComponent(request.url.replace('local-image://', ''))
+    return net.fetch(pathToFileURL(filePath).toString())
+  })
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -64,7 +72,7 @@ app.whenReady().then(() => {
       return null
     }
 
-    const snapshot = await createProjectSnapshotFromFolder(result.filePaths[0])
+    const snapshot = await createProjectSnapshotFromFolder(result.filePaths[0], thumbnailBaseDir)
     await projectRepository.saveSnapshot(snapshot)
     return snapshot
   })
@@ -75,6 +83,11 @@ app.whenReady().then(() => {
 
   ipcMain.handle('project:save-snapshot', async (_, snapshot: ReviewProjectSnapshot) => {
     await projectRepository.saveSnapshot(snapshot)
+    return true
+  })
+
+  ipcMain.handle('project:remove-snapshot', async (_, projectId: string) => {
+    await projectRepository.removeSnapshot(projectId)
     return true
   })
 

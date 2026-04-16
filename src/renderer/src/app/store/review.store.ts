@@ -73,6 +73,10 @@ export const useReviewStore = defineStore('review', () => {
     saveStatus.value = 'saved'
   }
 
+  function removeProjectReviews(projectId: string): void {
+    reviews.value = reviews.value.filter((review) => review.projectId !== projectId)
+  }
+
   function refreshProjectSummary(projectId: string): void {
     const projectAssets = assetStore.assets.filter((asset) => asset.projectId === projectId)
     const projectReviews = reviews.value.filter((review) => review.projectId === projectId)
@@ -108,6 +112,7 @@ export const useReviewStore = defineStore('review', () => {
     updateComment,
     replaceBySnapshot,
     replaceBySnapshots,
+    removeProjectReviews,
     refreshProjectSummary,
     persistProject
   }

@@ -29,12 +29,14 @@
             v-for="project in projectStore.projects"
             :key="project.id"
             class="project-tile"
-            @click="goReview(project.id)"
           >
-            <div class="project-cover" />
-            <strong>{{ project.name }}</strong>
-            <span>{{ project.assetCount }} 张图片</span>
-            <span class="section-tip">最近打开：{{ formatDate(project.lastOpenedAt) }}</span>
+            <div class="project-tile-top" @click="goReview(project.id)">
+              <img class="project-cover" :src="getProjectCover(project.id, project.coverAssetId)" alt="" />
+              <strong>{{ project.name }}</strong>
+              <span>{{ project.assetCount }} 张图片</span>
+              <span class="section-tip">最近打开：{{ formatDate(project.lastOpenedAt) }}</span>
+            </div>
+            <a-button danger @click.stop="removeProject(project.id)">从书架移除</a-button>
           </article>
         </div>
       </div>
@@ -62,6 +64,7 @@ import { message } from 'ant-design-vue'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
+import { toFileUrl } from '@renderer/app/utils/file'
 import type { ReviewProjectSnapshot } from '@renderer/app/types/review'
 
 const router = useRouter()
@@ -95,6 +98,26 @@ async function openFolder(): Promise<void> {
     message.error('打开文件夹失败，请稍后重试')
   } finally {
     opening.value = false
+  }
+}
+
+function getProjectCover(projectId: string, coverAssetId?: string): string {
+  const asset =
+    assetStore.assets.find((item) => item.id === coverAssetId) ??
+    assetStore.assets.find((item) => item.projectId === projectId)
+  return toFileUrl(asset?.thumbnailPath || asset?.filePath)
+}
+
+async function removeProject(projectId: string): Promise<void> {
+  try {
+    await window.api.removeProjectSnapshot(projectId)
+    projectStore.removeProject(projectId)
+    assetStore.removeProjectAssets(projectId)
+    reviewStore.removeProjectReviews(projectId)
+    message.success('已从书架移除项目')
+  } catch (error) {
+    console.error(error)
+    message.error('移除项目失败，请稍后重试')
   }
 }
 </script>

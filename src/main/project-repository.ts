@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
+import { mkdir, readdir, readFile, rm, writeFile } from 'fs/promises'
 import { join } from 'path'
 
 import type { ReviewProjectSnapshot } from './project-scanner'
@@ -36,5 +36,10 @@ export class ProjectRepository {
     await mkdir(this.baseDir, { recursive: true })
     const filePath = join(this.baseDir, `${snapshot.project.id}.json`)
     await writeFile(filePath, JSON.stringify(snapshot, null, 2), 'utf8')
+  }
+
+  async removeSnapshot(projectId: string): Promise<void> {
+    const filePath = join(this.baseDir, `${projectId}.json`)
+    await rm(filePath, { force: true })
   }
 }

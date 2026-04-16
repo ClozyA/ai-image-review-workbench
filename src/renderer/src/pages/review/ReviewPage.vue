@@ -16,7 +16,7 @@
     </header>
 
     <main class="review-layout">
-      <section class="page-card">
+      <section class="page-card review-card review-card-list">
         <div class="section-header">
           <h2>图片列表</h2>
           <span class="section-tip">批量浏览与快速切换</span>
@@ -29,7 +29,7 @@
             :class="{ active: item.asset.id === assetStore.currentAssetId }"
             @click="assetStore.selectAsset(item.asset.id)"
           >
-            <span class="thumb-box" />
+            <img class="thumb-box" :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)" alt="" />
             <span class="thumb-meta">
               <strong>{{ item.asset.fileName }}</strong>
               <small>{{ item.decisionText }} · {{ item.categoryText }}</small>
@@ -38,16 +38,18 @@
         </div>
       </section>
 
-      <section class="page-card">
+      <section class="page-card review-card review-card-preview">
         <div class="section-header">
           <h2>当前图片</h2>
           <span class="section-tip">中间只负责看图</span>
         </div>
-        <div class="preview-box" />
+        <img class="preview-box" :src="getOriginalSrc(currentItem?.asset.filePath)" alt="" />
         <div class="meta-grid">
           <div class="meta-card">
             <span>文件名</span>
-            <strong>{{ currentItem?.asset.fileName ?? '-' }}</strong>
+            <strong class="meta-file-name" :title="currentItem?.asset.fileName ?? '-'">
+              {{ currentItem?.asset.fileName ?? '-' }}
+            </strong>
           </div>
           <div class="meta-card">
             <span>分辨率</span>
@@ -57,58 +59,61 @@
             <span>大小</span>
             <strong>{{ formatFileSize(currentItem?.asset.fileSize) }}</strong>
           </div>
-          <div class="meta-card">
-            <span>自动保存</span>
-            <strong>{{ saveStatusText }}</strong>
-          </div>
         </div>
       </section>
 
-      <section class="page-card">
+      <section class="page-card review-card review-card-panel">
         <div class="section-header">
           <h2>审核面板</h2>
           <span class="section-tip">结论、分类、备注</span>
         </div>
 
-        <div class="field-block">
-          <label class="field-label">处理结论</label>
-          <a-space wrap>
-            <a-button
-              v-for="option in REVIEW_DECISION_OPTIONS"
-              :key="option.value"
-              :type="currentReview?.decision === option.value ? 'primary' : 'default'"
-              @click="updateDecision(option.value)"
-            >
-              {{ option.label }}
-            </a-button>
-          </a-space>
+        <div class="review-panel-body">
+          <div class="field-block">
+            <label class="field-label">处理结论</label>
+            <a-space wrap>
+              <a-button
+                v-for="option in REVIEW_DECISION_OPTIONS"
+                :key="option.value"
+                :type="currentReview?.decision === option.value ? 'primary' : 'default'"
+                @click="updateDecision(option.value)"
+              >
+                {{ option.label }}
+              </a-button>
+            </a-space>
+          </div>
+
+          <div class="field-block">
+            <label class="field-label">分类</label>
+            <a-space wrap>
+              <a-button
+                v-for="option in ASSET_CATEGORY_OPTIONS"
+                :key="option.value"
+                :type="currentReview?.category === option.value ? 'primary' : 'default'"
+                @click="updateCategory(option.value)"
+              >
+                {{ option.label }}
+              </a-button>
+            </a-space>
+          </div>
+
+          <div class="field-block">
+            <label class="field-label">备注</label>
+            <a-textarea
+              :value="currentReview?.comment"
+              :rows="10"
+              placeholder="补充为什么通过、为什么待定，或者记录后续处理说明。"
+              @update:value="onCommentChange"
+            />
+          </div>
         </div>
 
-        <div class="field-block">
-          <label class="field-label">分类</label>
-          <a-space wrap>
-            <a-button
-              v-for="option in ASSET_CATEGORY_OPTIONS"
-              :key="option.value"
-              :type="currentReview?.category === option.value ? 'primary' : 'default'"
-              @click="updateCategory(option.value)"
-            >
-              {{ option.label }}
-            </a-button>
-          </a-space>
+        <div class="review-actions">
+          <a-button size="large" :disabled="isPreviousDisabled" @click="selectPrevious">上一张</a-button>
+          <a-button type="primary" size="large" :disabled="isNextDisabled" @click="handlePrimaryAction">
+            {{ primaryActionText }}
+          </a-button>
         </div>
-
-        <div class="field-block">
-          <label class="field-label">备注</label>
-          <a-textarea
-            :value="currentReview?.comment"
-            :rows="6"
-            placeholder="补充为什么通过、为什么待定，或者记录后续处理说明。"
-            @update:value="onCommentChange"
-          />
-        </div>
-
-        <a-button type="primary" block size="large" @click="selectNext">下一张</a-button>
       </section>
     </main>
   </div>
@@ -127,6 +132,7 @@ import {
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
+import { toFileUrl } from '@renderer/app/utils/file'
 import type { AssetCategory, AssetViewModel, ReviewDecision } from '@renderer/app/types/review'
 
 const route = useRoute()
@@ -167,11 +173,22 @@ const currentIndex = computed(() => {
   return index >= 0 ? index + 1 : 0
 })
 
-const saveStatusText = computed(() => {
-  if (reviewStore.saveStatus === 'saving') return '保存中'
-  if (reviewStore.saveStatus === 'saved') return '已保存'
-  return '未保存'
+const isLastAsset = computed(() => currentIndex.value === projectAssets.value.length)
+const isPreviousDisabled = computed(() => currentIndex.value <= 1)
+
+const isAllReviewed = computed(
+  () =>
+    projectStore.currentSummary.totalCount > 0 &&
+    projectStore.currentSummary.reviewedCount === projectStore.currentSummary.totalCount
+)
+
+const primaryActionText = computed(() => {
+  if (isLastAsset.value && isAllReviewed.value) return '查看结果'
+  if (isLastAsset.value) return '已是最后一张'
+  return '下一张'
 })
+
+const isNextDisabled = computed(() => isLastAsset.value && !isAllReviewed.value)
 
 watchEffect(() => {
   const routeProjectId = String(route.params.projectId || '')
@@ -199,6 +216,20 @@ function selectNext(): void {
   assetStore.selectNextAsset()
 }
 
+function selectPrevious(): void {
+  assetStore.selectPreviousAsset()
+}
+
+function handlePrimaryAction(): void {
+  if (isLastAsset.value && isAllReviewed.value) {
+    goResult()
+    return
+  }
+  if (!isLastAsset.value) {
+    selectNext()
+  }
+}
+
 function goHome(): void {
   router.push({ name: 'home' })
 }
@@ -214,5 +245,13 @@ function goResult(): void {
 function formatFileSize(value?: number): string {
   if (!value) return '-'
   return `${(value / 1024 / 1024).toFixed(1)} MB`
+}
+
+function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
+  return toFileUrl(thumbnailPath || filePath)
+}
+
+function getOriginalSrc(filePath?: string): string {
+  return toFileUrl(filePath)
 }
 </script>

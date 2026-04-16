@@ -56,11 +56,16 @@
             <h2>备注概览</h2>
             <span class="section-tip">后续可以扩展成导出摘要</span>
           </div>
-          <ul class="info-list">
-            <li v-for="item in commentedItems" :key="item.asset.id">
-              {{ item.asset.fileName }}：{{ item.review.comment }}
-            </li>
-          </ul>
+          <div class="result-list">
+            <article v-for="item in commentedItems" :key="item.asset.id" class="result-item">
+              <img class="result-item-cover" :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)" alt="" />
+              <div class="result-item-main">
+                <strong>{{ item.asset.fileName }}</strong>
+                <span>{{ item.review.category ? categoryText(item.review.category) : '未分类' }}</span>
+                <small>{{ item.review.comment }}</small>
+              </div>
+            </article>
+          </div>
         </article>
       </section>
     </main>
@@ -71,10 +76,12 @@
 import { computed, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { ASSET_CATEGORY_OPTIONS } from '@renderer/app/constants/review'
+import { ASSET_CATEGORY_OPTIONS, ASSET_CATEGORY_TEXT } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
+import { toFileUrl } from '@renderer/app/utils/file'
+import type { AssetCategory } from '@renderer/app/types/review'
 
 const route = useRoute()
 const router = useRouter()
@@ -107,5 +114,13 @@ function goFilter(): void {
 
 function goReview(): void {
   router.push({ name: 'review', params: { projectId: projectStore.currentProjectId } })
+}
+
+function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
+  return toFileUrl(thumbnailPath || filePath)
+}
+
+function categoryText(category: AssetCategory): string {
+  return ASSET_CATEGORY_TEXT[category]
 }
 </script>

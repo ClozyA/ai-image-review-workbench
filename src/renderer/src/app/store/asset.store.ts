@@ -40,6 +40,13 @@ export const useAssetStore = defineStore('asset', () => {
     currentAssetId.value = snapshots[0]?.assets[0]?.id ?? ''
   }
 
+  function removeProjectAssets(projectId: string): void {
+    assets.value = assets.value.filter((asset) => asset.projectId !== projectId)
+    if (!assets.value.find((asset) => asset.id === currentAssetId.value)) {
+      currentAssetId.value = assets.value[0]?.id ?? ''
+    }
+  }
+
   return {
     assets,
     currentAssetId,
@@ -48,6 +55,7 @@ export const useAssetStore = defineStore('asset', () => {
     selectNextAsset,
     selectPreviousAsset,
     replaceBySnapshot,
-    replaceBySnapshots
+    replaceBySnapshots,
+    removeProjectAssets
   }
 })

@@ -82,7 +82,7 @@
 
         <div class="result-list">
           <article v-for="item in filteredItems" :key="item.asset.id" class="result-item">
-            <div class="result-item-cover" />
+            <img class="result-item-cover" :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)" alt="" />
             <div class="result-item-main">
               <strong>{{ item.asset.fileName }}</strong>
               <span>
@@ -112,6 +112,7 @@ import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useFilterStore } from '@renderer/app/store/filter.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
+import { toFileUrl } from '@renderer/app/utils/file'
 import type { AssetViewModel } from '@renderer/app/types/review'
 
 const route = useRoute()
@@ -168,5 +169,9 @@ function goReview(): void {
 
 function goResult(): void {
   router.push({ name: 'result', params: { projectId: projectStore.currentProjectId } })
+}
+
+function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
+  return toFileUrl(thumbnailPath || filePath)
 }
 </script>

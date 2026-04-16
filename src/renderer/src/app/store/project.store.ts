@@ -87,6 +87,17 @@ export const useProjectStore = defineStore('project', () => {
     currentProjectId.value = snapshots[0]?.project.id ?? ''
   }
 
+  function removeProject(projectId: ProjectId): void {
+    projects.value = projects.value.filter((project) => project.id !== projectId)
+    const nextSummaries = { ...summaries.value }
+    delete nextSummaries[projectId]
+    summaries.value = nextSummaries
+
+    if (currentProjectId.value === projectId) {
+      currentProjectId.value = projects.value[0]?.id ?? ''
+    }
+  }
+
   return {
     projects,
     currentProjectId,
@@ -96,6 +107,7 @@ export const useProjectStore = defineStore('project', () => {
     selectProject,
     refreshSummary,
     upsertProject,
-    replaceBySnapshots
+    replaceBySnapshots,
+    removeProject
   }
 })
