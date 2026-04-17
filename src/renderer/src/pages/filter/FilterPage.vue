@@ -5,6 +5,7 @@
         <h1 class="page-title">结果筛选</h1>
       </div>
       <a-space>
+        <a-button @click="goHome">返回首页</a-button>
         <a-button @click="goReview">返回审核页</a-button>
         <a-button @click="goResult">结果页</a-button>
       </a-space>
@@ -100,7 +101,15 @@
       <section class="page-card filter-card filter-card-results">
         <div class="section-header">
           <h2>筛选结果</h2>
-          <span class="section-tip">共 {{ filteredItems.length }} 张</span>
+          <a-space>
+            <span class="section-tip">共 {{ filteredItems.length }} 张</span>
+            <a-button size="small" :loading="exportingJson" @click="exportFilteredResults('json')">
+              导出 JSON
+            </a-button>
+            <a-button size="small" :loading="exportingCsv" @click="exportFilteredResults('csv')">
+              导出 CSV
+            </a-button>
+          </a-space>
         </div>
 
         <div v-if="filteredItems.length" class="result-list filter-result-list">
@@ -131,8 +140,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 import {
   ASSET_CATEGORY_OPTIONS,
@@ -144,7 +154,13 @@ import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useFilterStore } from '@renderer/app/store/filter.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
+import {
+  buildExportItems,
+  buildProjectExportPayload,
+  buildProjectSnapshotForExport
+} from '@renderer/app/utils/export'
 import { toFileUrl } from '@renderer/app/utils/file'
+import type { ExportFormat } from '@renderer/app/types/export'
 import type { AssetViewModel } from '@renderer/app/types/review'
 
 const route = useRoute()
@@ -153,6 +169,8 @@ const projectStore = useProjectStore()
 const assetStore = useAssetStore()
 const reviewStore = useReviewStore()
 const filterStore = useFilterStore()
+const exportingJson = ref(false)
+const exportingCsv = ref(false)
 
 const filter = computed(() => filterStore.filter)
 const currentProject = computed(() => projectStore.currentProject)
@@ -202,11 +220,78 @@ function goReview(): void {
   router.push({ name: 'review', params: { projectId: projectStore.currentProjectId } })
 }
 
+function goHome(): void {
+  router.push({ name: 'home' })
+}
+
 function goResult(): void {
   router.push({ name: 'result', params: { projectId: projectStore.currentProjectId } })
 }
 
 function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
   return toFileUrl(thumbnailPath || filePath)
+}
+
+async function exportFilteredResults(format: ExportFormat): Promise<void> {
+  const snapshot = buildProjectSnapshotForExport(
+    currentProject.value,
+    assetStore.assets,
+    reviewStore.reviews
+  )
+  if (!snapshot) {
+    message.warning('当前没有可导出的项目')
+    return
+  }
+
+  const loadingRef = format === 'json' ? exportingJson : exportingCsv
+  loadingRef.value = true
+
+  try {
+    const items = buildExportItems(
+      snapshot,
+      filteredItems.value.map((item) => item.asset.id)
+    )
+    const payload = buildProjectExportPayload(snapshot, 'filtered', items, {
+      filterDescription: buildFilterDescription(),
+      summary: {
+        filteredCount: items.length
+      }
+    })
+
+    const result = await window.api.exportProjectResults(payload, format)
+    if (result.canceled) return
+    message.success(`已导出筛选结果：${result.filePath}`)
+  } catch (error) {
+    console.error(error)
+    message.error('导出筛选结果失败，请稍后重试')
+  } finally {
+    loadingRef.value = false
+  }
+}
+
+function buildFilterDescription(): string {
+  const parts: string[] = []
+
+  if (filter.value.decisions.length) {
+    parts.push(
+      `结论：${filter.value.decisions.map((value) => REVIEW_DECISION_TEXT[value]).join('、')}`
+    )
+  }
+  if (filter.value.categories.length) {
+    parts.push(
+      `分类：${filter.value.categories.map((value) => ASSET_CATEGORY_TEXT[value]).join('、')}`
+    )
+  }
+  if (filter.value.hasComment === true) {
+    parts.push('备注：仅看有备注')
+  }
+  if (filter.value.hasComment === false) {
+    parts.push('备注：仅看无备注')
+  }
+  if (filter.value.keyword.trim()) {
+    parts.push(`关键词：${filter.value.keyword.trim()}`)
+  }
+
+  return parts.join('；') || '全部结果'
 }
 </script>

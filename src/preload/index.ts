@@ -3,9 +3,14 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
   openProjectFolder: () => ipcRenderer.invoke('project:open-folder'),
+  importLocalBackup: () => ipcRenderer.invoke('project:import-local-backup'),
+  importFullProjectBundle: () => ipcRenderer.invoke('project:import-full-bundle'),
   listProjectSnapshots: () => ipcRenderer.invoke('project:list-snapshots'),
   saveProjectSnapshot: (snapshot) => ipcRenderer.invoke('project:save-snapshot', snapshot),
-  removeProjectSnapshot: (projectId) => ipcRenderer.invoke('project:remove-snapshot', projectId)
+  removeProjectSnapshot: (projectId) => ipcRenderer.invoke('project:remove-snapshot', projectId),
+  exportProjectResults: (payload, format) =>
+    ipcRenderer.invoke('project:export-results', payload, format),
+  exportFullProjectBundle: (snapshot) => ipcRenderer.invoke('project:export-full-bundle', snapshot)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

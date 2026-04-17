@@ -5,6 +5,14 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createProjectSnapshotFromFolder, type ReviewProjectSnapshot } from './project-scanner'
 import { ProjectRepository } from './project-repository'
+import { importFullProjectBundle } from './project-importer'
+import { importLocalBackupJson } from './project-backup-importer'
+import {
+  exportFullProjectBundle,
+  exportReviewData,
+  type ExportFormat,
+  type ExportPayload
+} from './export-service'
 
 function createWindow(): void {
   // Create the browser window.
@@ -81,6 +89,20 @@ app.whenReady().then(() => {
     return projectRepository.listSnapshots()
   })
 
+  ipcMain.handle('project:import-full-bundle', async () => {
+    const snapshot = await importFullProjectBundle(thumbnailBaseDir)
+    if (!snapshot) return null
+    await projectRepository.saveSnapshot(snapshot)
+    return snapshot
+  })
+
+  ipcMain.handle('project:import-local-backup', async () => {
+    const snapshot = await importLocalBackupJson(thumbnailBaseDir)
+    if (!snapshot) return null
+    await projectRepository.saveSnapshot(snapshot)
+    return snapshot
+  })
+
   ipcMain.handle('project:save-snapshot', async (_, snapshot: ReviewProjectSnapshot) => {
     await projectRepository.saveSnapshot(snapshot)
     return true
@@ -89,6 +111,17 @@ app.whenReady().then(() => {
   ipcMain.handle('project:remove-snapshot', async (_, projectId: string) => {
     await projectRepository.removeSnapshot(projectId)
     return true
+  })
+
+  ipcMain.handle(
+    'project:export-results',
+    async (_, payload: ExportPayload, format: ExportFormat) => {
+      return exportReviewData(payload, format)
+    }
+  )
+
+  ipcMain.handle('project:export-full-bundle', async (_, snapshot: ReviewProjectSnapshot) => {
+    return exportFullProjectBundle(snapshot)
   })
 
   createWindow()

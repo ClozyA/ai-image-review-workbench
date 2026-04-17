@@ -3,8 +3,19 @@
     <header class="app-header">
       <div>
         <h1 class="page-title">结果页</h1>
+        <p class="page-subtitle">
+          完整项目导出适合发给别人，JSON 备份可在当前电脑重新导入，CSV 更适合作为查看和流转记录。
+        </p>
       </div>
       <a-space>
+        <a-button :loading="exportingBundle" type="primary" @click="exportCompleteProject">
+          导出完整项目
+        </a-button>
+        <a-button :loading="exportingJson" @click="exportProjectResults('json')"
+          >备份 JSON</a-button
+        >
+        <a-button :loading="exportingCsv" @click="exportProjectResults('csv')">备份 CSV</a-button>
+        <a-button @click="goHome">返回首页</a-button>
         <a-button @click="goFilter">返回筛选页</a-button>
         <a-button @click="goReview">继续审核</a-button>
       </a-space>
@@ -93,14 +104,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 import { ASSET_CATEGORY_OPTIONS, ASSET_CATEGORY_TEXT } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
+import {
+  buildExportItems,
+  buildProjectExportPayload,
+  buildProjectSnapshotForExport
+} from '@renderer/app/utils/export'
 import { toFileUrl } from '@renderer/app/utils/file'
+import type { ExportFormat } from '@renderer/app/types/export'
 import type { AssetCategory } from '@renderer/app/types/review'
 
 const route = useRoute()
@@ -108,6 +126,9 @@ const router = useRouter()
 const assetStore = useAssetStore()
 const projectStore = useProjectStore()
 const reviewStore = useReviewStore()
+const exportingBundle = ref(false)
+const exportingJson = ref(false)
+const exportingCsv = ref(false)
 
 const summary = computed(() => projectStore.currentSummary)
 const currentProject = computed(() => projectStore.currentProject)
@@ -133,6 +154,10 @@ function goFilter(): void {
   router.push({ name: 'filter', params: { projectId: projectStore.currentProjectId } })
 }
 
+function goHome(): void {
+  router.push({ name: 'home' })
+}
+
 function goReview(): void {
   router.push({ name: 'review', params: { projectId: projectStore.currentProjectId } })
 }
@@ -143,5 +168,68 @@ function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
 
 function categoryText(category: AssetCategory): string {
   return ASSET_CATEGORY_TEXT[category]
+}
+
+async function exportProjectResults(format: ExportFormat): Promise<void> {
+  const snapshot = buildProjectSnapshotForExport(
+    currentProject.value,
+    assetStore.assets,
+    reviewStore.reviews
+  )
+  if (!snapshot) {
+    message.warning('当前没有可导出的项目')
+    return
+  }
+
+  const loadingRef = format === 'json' ? exportingJson : exportingCsv
+  loadingRef.value = true
+
+  try {
+    const items = buildExportItems(snapshot)
+    const payload = buildProjectExportPayload(snapshot, 'project', items, {
+      summary: {
+        totalCount: summary.value.totalCount,
+        reviewedCount: summary.value.reviewedCount,
+        approvedCount: summary.value.approvedCount,
+        pendingCount: summary.value.pendingCount,
+        rejectedCount: summary.value.rejectedCount,
+        commentedCount: summary.value.commentedCount
+      }
+    })
+
+    const result = await window.api.exportProjectResults(payload, format)
+    if (result.canceled) return
+    message.success(`已导出本机备份：${result.filePath}`)
+  } catch (error) {
+    console.error(error)
+    message.error('导出审核结果失败，请稍后重试')
+  } finally {
+    loadingRef.value = false
+  }
+}
+
+async function exportCompleteProject(): Promise<void> {
+  const snapshot = buildProjectSnapshotForExport(
+    currentProject.value,
+    assetStore.assets,
+    reviewStore.reviews
+  )
+  if (!snapshot) {
+    message.warning('当前没有可导出的项目')
+    return
+  }
+
+  exportingBundle.value = true
+
+  try {
+    const result = await window.api.exportFullProjectBundle(snapshot)
+    if (result.canceled) return
+    message.success(`已导出完整项目：${result.filePath}`)
+  } catch (error) {
+    console.error(error)
+    message.error('导出完整项目失败，请稍后重试')
+  } finally {
+    exportingBundle.value = false
+  }
 }
 </script>

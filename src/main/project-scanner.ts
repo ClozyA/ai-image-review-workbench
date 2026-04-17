@@ -43,14 +43,7 @@ export interface ReviewProjectSnapshot {
   }>
 }
 
-const SUPPORTED_IMAGE_EXTENSIONS = new Set([
-  '.jpg',
-  '.jpeg',
-  '.png',
-  '.webp',
-  '.bmp',
-  '.gif'
-])
+const SUPPORTED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif'])
 // 首次导入时只预生成首屏附近会用到的缩略图，避免大批量图片把创建项目拖得太慢。
 const THUMBNAIL_PREGENERATE_LIMIT = 24
 
@@ -121,6 +114,33 @@ export async function createProjectSnapshotFromFolder(
     },
     assets,
     reviews
+  }
+}
+
+export async function hydrateSnapshotThumbnails(
+  snapshot: ReviewProjectSnapshot,
+  thumbnailBaseDir: string
+): Promise<ReviewProjectSnapshot> {
+  const thumbnailDir = join(thumbnailBaseDir, snapshot.project.id)
+  await mkdir(thumbnailDir, { recursive: true })
+
+  const assets = await Promise.all(
+    snapshot.assets.map(async (asset, index) => {
+      const thumbnailPath =
+        index < THUMBNAIL_PREGENERATE_LIMIT
+          ? await ensureThumbnail(asset.filePath, thumbnailDir, asset.id)
+          : undefined
+
+      return {
+        ...asset,
+        thumbnailPath
+      }
+    })
+  )
+
+  return {
+    ...snapshot,
+    assets
   }
 }
 

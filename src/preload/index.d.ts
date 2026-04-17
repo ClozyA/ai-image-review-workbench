@@ -1,4 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import type { ExportFormat, ExportPayload, ExportResult } from '@renderer/app/types/export'
 
 interface ReviewProjectSnapshot {
   project: {
@@ -37,9 +38,13 @@ interface ReviewProjectSnapshot {
 
 interface RendererApi {
   openProjectFolder: () => Promise<ReviewProjectSnapshot | null>
+  importLocalBackup: () => Promise<ReviewProjectSnapshot | null>
+  importFullProjectBundle: () => Promise<ReviewProjectSnapshot | null>
   listProjectSnapshots: () => Promise<ReviewProjectSnapshot[]>
   saveProjectSnapshot: (snapshot: ReviewProjectSnapshot) => Promise<boolean>
   removeProjectSnapshot: (projectId: string) => Promise<boolean>
+  exportProjectResults: (payload: ExportPayload, format: ExportFormat) => Promise<ExportResult>
+  exportFullProjectBundle: (snapshot: ReviewProjectSnapshot) => Promise<ExportResult>
 }
 
 declare global {

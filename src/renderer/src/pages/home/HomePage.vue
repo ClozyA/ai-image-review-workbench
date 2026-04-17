@@ -6,7 +6,8 @@
       </div>
       <a-space>
         <a-button type="primary" :loading="opening" @click="openFolder">打开文件夹</a-button>
-        <a-button>导入结果</a-button>
+        <a-button :loading="importingBackup" @click="importLocalBackup">导入本地备份</a-button>
+        <a-button :loading="importing" @click="importProjectBundle">导入完整项目</a-button>
       </a-space>
     </header>
 
@@ -25,7 +26,11 @@
               <span>从图片文件夹创建项目</span>
             </article>
 
-            <article v-for="project in projectStore.projects" :key="project.id" class="project-tile">
+            <article
+              v-for="project in projectStore.projects"
+              :key="project.id"
+              class="project-tile"
+            >
               <div class="project-tile-top" @click="goReview(project.id)">
                 <img
                   class="project-cover"
@@ -80,6 +85,8 @@ const projectStore = useProjectStore()
 const assetStore = useAssetStore()
 const reviewStore = useReviewStore()
 const opening = ref(false)
+const importingBackup = ref(false)
+const importing = ref(false)
 
 const renameModalOpen = ref(false)
 const renameInput = ref('')
@@ -109,6 +116,34 @@ function isNoImagesFoundError(error: unknown): boolean {
   return false
 }
 
+function isImportManifestNotFoundError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('IMPORT_MANIFEST_NOT_FOUND')
+  }
+  return false
+}
+
+function isImportManifestInvalidError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('IMPORT_MANIFEST_INVALID')
+  }
+  return false
+}
+
+function isImportBackupInvalidError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('IMPORT_BACKUP_INVALID')
+  }
+  return false
+}
+
+function isImportBackupNoLocalAssetsError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('IMPORT_BACKUP_NO_LOCAL_ASSETS')
+  }
+  return false
+}
+
 async function openFolder(): Promise<void> {
   opening.value = true
   try {
@@ -131,6 +166,70 @@ async function openFolder(): Promise<void> {
     message.error('打开文件夹失败，请稍后重试')
   } finally {
     opening.value = false
+  }
+}
+
+async function importProjectBundle(): Promise<void> {
+  importing.value = true
+  try {
+    const snapshot = (await window.api.importFullProjectBundle()) as ReviewProjectSnapshot | null
+    if (!snapshot) return
+    projectStore.upsertProject(snapshot)
+    assetStore.replaceBySnapshot(snapshot)
+    reviewStore.replaceBySnapshot(snapshot)
+    await router.push({ name: 'review', params: { projectId: snapshot.project.id } })
+    message.success(`已导入完整项目：${snapshot.project.name}`)
+  } catch (error) {
+    console.error(error)
+    if (isImportManifestNotFoundError(error)) {
+      Modal.error({
+        title: '没有找到完整项目清单',
+        content: '请选择包含 project-manifest.json 的完整项目导出目录。'
+      })
+      return
+    }
+    if (isImportManifestInvalidError(error)) {
+      Modal.error({
+        title: '完整项目清单无效',
+        content: '当前目录中的 project-manifest.json 无法识别，请确认它来自本工具的完整项目导出。'
+      })
+      return
+    }
+    message.error('导入完整项目失败，请稍后重试')
+  } finally {
+    importing.value = false
+  }
+}
+
+async function importLocalBackup(): Promise<void> {
+  importingBackup.value = true
+  try {
+    const snapshot = (await window.api.importLocalBackup()) as ReviewProjectSnapshot | null
+    if (!snapshot) return
+    projectStore.upsertProject(snapshot)
+    assetStore.replaceBySnapshot(snapshot)
+    reviewStore.replaceBySnapshot(snapshot)
+    await router.push({ name: 'review', params: { projectId: snapshot.project.id } })
+    message.success(`已导入本地备份：${snapshot.project.name}`)
+  } catch (error) {
+    console.error(error)
+    if (isImportBackupInvalidError(error)) {
+      Modal.error({
+        title: '本地备份文件无效',
+        content: '请选择本工具导出的 JSON 备份文件。'
+      })
+      return
+    }
+    if (isImportBackupNoLocalAssetsError(error)) {
+      Modal.error({
+        title: '没有找到可恢复的本地图片',
+        content: '这个 JSON 备份里记录的图片路径在当前电脑上不可用，所以无法恢复项目。'
+      })
+      return
+    }
+    message.error('导入本地备份失败，请稍后重试')
+  } finally {
+    importingBackup.value = false
   }
 }
 
