@@ -51,6 +51,8 @@ const SUPPORTED_IMAGE_EXTENSIONS = new Set([
   '.bmp',
   '.gif'
 ])
+// 首次导入时只预生成首屏附近会用到的缩略图，避免大批量图片把创建项目拖得太慢。
+const THUMBNAIL_PREGENERATE_LIMIT = 24
 
 export async function createProjectSnapshotFromFolder(
   folderPath: string,
@@ -78,7 +80,10 @@ export async function createProjectSnapshotFromFolder(
     const fileStat = await stat(filePath)
     const size = readImageSize(filePath)
     const assetId = randomUUID()
-    const thumbnailPath = await ensureThumbnail(filePath, thumbnailDir, assetId)
+    const thumbnailPath =
+      assets.length < THUMBNAIL_PREGENERATE_LIMIT
+        ? await ensureThumbnail(filePath, thumbnailDir, assetId)
+        : undefined
 
     assets.push({
       id: assetId,

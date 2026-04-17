@@ -21,16 +21,21 @@
           <h2>图片列表</h2>
           <span class="section-tip">批量浏览与快速切换</span>
         </div>
-        <div ref="thumbListRef" class="thumb-list">
+        <div ref="thumbListRef" class="thumb-list" @scroll="handleThumbListScroll">
           <button
-            v-for="item in reviewItems"
+            v-for="item in visibleReviewItems"
             :key="item.asset.id"
             class="thumb-row"
             :data-asset-id="item.asset.id"
             :class="{ active: item.asset.id === assetStore.currentAssetId }"
             @click="assetStore.selectAsset(item.asset.id)"
           >
-            <img class="thumb-box" :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)" alt="" />
+            <img
+              class="thumb-box"
+              :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)"
+              alt=""
+              loading="lazy"
+            />
             <span class="thumb-meta">
               <strong>{{ item.asset.fileName }}</strong>
               <small>{{ item.decisionText }} · {{ item.categoryText }}</small>
@@ -44,7 +49,16 @@
           <h2>当前图片</h2>
           <span class="section-tip">中间只负责看图</span>
         </div>
-        <img class="preview-box" :src="getOriginalSrc(currentItem?.asset.filePath)" alt="" />
+        <img
+          v-if="currentItem?.asset.filePath"
+          class="preview-box"
+          :src="getOriginalSrc(currentItem?.asset.filePath)"
+          alt=""
+        />
+        <div v-else class="preview-empty">
+          <strong>当前没有可预览的图片</strong>
+          <span>请从左侧图片列表选择，或返回首页重新导入项目。</span>
+        </div>
         <div class="meta-grid">
           <div class="meta-card">
             <span>文件名</span>
@@ -142,6 +156,7 @@ const projectStore = useProjectStore()
 const assetStore = useAssetStore()
 const reviewStore = useReviewStore()
 const thumbListRef = ref<HTMLElement | null>(null)
+const visibleThumbCount = ref(60)
 
 const projectAssets = computed(() =>
   assetStore.assets.filter((asset) => asset.projectId === projectStore.currentProjectId)
@@ -161,6 +176,8 @@ const reviewItems = computed<AssetViewModel[]>(() =>
     }
   })
 )
+
+const visibleReviewItems = computed(() => reviewItems.value.slice(0, visibleThumbCount.value))
 
 const currentItem = computed(
   () => reviewItems.value.find((item) => item.asset.id === assetStore.currentAssetId) ?? null
@@ -208,6 +225,30 @@ watchEffect(() => {
   const routeProjectId = String(route.params.projectId || '')
   if (routeProjectId && routeProjectId !== projectStore.currentProjectId) {
     projectStore.selectProject(routeProjectId)
+  }
+})
+
+watch(
+  () => projectStore.currentProjectId,
+  () => {
+    visibleThumbCount.value = 60
+  }
+)
+
+watchEffect(() => {
+  if (!projectAssets.value.length) {
+    if (assetStore.currentAssetId) {
+      assetStore.selectAsset('')
+    }
+    return
+  }
+
+  const currentAssetBelongsToProject = projectAssets.value.some(
+    (asset) => asset.id === assetStore.currentAssetId
+  )
+
+  if (!currentAssetBelongsToProject) {
+    assetStore.selectAsset(projectAssets.value[0].id)
   }
 })
 
@@ -259,6 +300,17 @@ function goResult(): void {
 function formatFileSize(value?: number): string {
   if (!value) return '-'
   return `${(value / 1024 / 1024).toFixed(1)} MB`
+}
+
+function handleThumbListScroll(event: Event): void {
+  const target = event.target as HTMLElement | null
+  if (!target) return
+
+  const remaining = target.scrollHeight - target.scrollTop - target.clientHeight
+  if (remaining > 240) return
+  if (visibleThumbCount.value >= reviewItems.value.length) return
+
+  visibleThumbCount.value = Math.min(visibleThumbCount.value + 60, reviewItems.value.length)
 }
 
 function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {

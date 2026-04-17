@@ -250,6 +250,22 @@ body {
   object-fit: contain;
 }
 
+.preview-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  text-align: center;
+  color: #6f7d97;
+}
+
+.preview-empty strong {
+  font-size: 18px;
+  color: #1f2a44;
+}
+
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

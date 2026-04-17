@@ -31,6 +31,7 @@
                 class="project-cover"
                 :src="getProjectCover(project.id, project.coverAssetId)"
                 alt=""
+                loading="lazy"
               />
               <strong>{{ project.name }}</strong>
               <span>{{ project.assetCount }} 张图片</span>

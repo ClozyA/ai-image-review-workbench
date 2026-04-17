@@ -58,10 +58,17 @@
           </div>
           <div class="result-list">
             <article v-for="item in commentedItems" :key="item.asset.id" class="result-item">
-              <img class="result-item-cover" :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)" alt="" />
+              <img
+                class="result-item-cover"
+                :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)"
+                alt=""
+                loading="lazy"
+              />
               <div class="result-item-main">
                 <strong>{{ item.asset.fileName }}</strong>
-                <span>{{ item.review.category ? categoryText(item.review.category) : '未分类' }}</span>
+                <span>{{
+                  item.review.category ? categoryText(item.review.category) : '未分类'
+                }}</span>
                 <small>{{ item.review.comment }}</small>
               </div>
             </article>

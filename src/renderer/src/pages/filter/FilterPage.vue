@@ -49,7 +49,10 @@
         <div class="field-block">
           <label class="field-label">备注</label>
           <a-space wrap>
-            <a-button :type="filter.hasComment === true ? 'primary' : 'default'" @click="filterStore.setHasComment(true)">
+            <a-button
+              :type="filter.hasComment === true ? 'primary' : 'default'"
+              @click="filterStore.setHasComment(true)"
+            >
               仅看有备注
             </a-button>
             <a-button
@@ -58,7 +61,10 @@
             >
               仅看无备注
             </a-button>
-            <a-button :type="filter.hasComment === undefined ? 'primary' : 'default'" @click="filterStore.setHasComment(undefined)">
+            <a-button
+              :type="filter.hasComment === undefined ? 'primary' : 'default'"
+              @click="filterStore.setHasComment(undefined)"
+            >
               全部
             </a-button>
           </a-space>
@@ -82,7 +88,12 @@
 
         <div class="result-list">
           <article v-for="item in filteredItems" :key="item.asset.id" class="result-item">
-            <img class="result-item-cover" :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)" alt="" />
+            <img
+              class="result-item-cover"
+              :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)"
+              alt=""
+              loading="lazy"
+            />
             <div class="result-item-main">
               <strong>{{ item.asset.fileName }}</strong>
               <span>
@@ -141,9 +152,11 @@ const projectItems = computed<AssetViewModel[]>(() =>
 
 const filteredItems = computed(() =>
   projectItems.value.filter((item) => {
-    if (filter.value.decisions.length && !filter.value.decisions.includes(item.review.decision)) return false
+    if (filter.value.decisions.length && !filter.value.decisions.includes(item.review.decision))
+      return false
     if (filter.value.categories.length) {
-      if (!item.review.category || !filter.value.categories.includes(item.review.category)) return false
+      if (!item.review.category || !filter.value.categories.includes(item.review.category))
+        return false
     }
     if (filter.value.hasComment === true && !item.review.comment.trim()) return false
     if (filter.value.hasComment === false && item.review.comment.trim()) return false
