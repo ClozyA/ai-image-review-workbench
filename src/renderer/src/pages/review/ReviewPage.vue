@@ -40,7 +40,8 @@
             <span class="thumb-meta">
               <strong>{{ item.asset.fileName }}</strong>
               <small>
-                {{ item.decisionText }} · {{ item.categoryText }}{{ item.review.favorite ? ' · 已收藏' : '' }}
+                {{ item.decisionText }} · {{ item.categoryText
+                }}{{ item.review.favorite ? ' · 已收藏' : '' }}
               </small>
             </span>
           </button>

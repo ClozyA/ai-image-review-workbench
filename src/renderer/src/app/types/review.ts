@@ -3,11 +3,7 @@ export type AssetId = string
 
 export type ReviewDecision = 'approved' | 'pending' | 'rejected' | 'unreviewed'
 
-export type AssetCategory =
-  | 'ai-generated'
-  | 'design-screenshot'
-  | 'campaign-material'
-  | 'reference'
+export type AssetCategory = 'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'
 
 export interface ReviewProject {
   id: ProjectId

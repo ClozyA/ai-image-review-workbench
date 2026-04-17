@@ -1,196 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>原型 - 结果筛选</title>
-  <link rel="stylesheet" href="./prototype.css" />
-</head>
-<body>
-  <div class="shell">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-mark">AI</div>
-        <div>
-          <h2>结果筛选</h2>
-          <p class="muted">按结论、分类和备注快速筛出目标图片</p>
-        </div>
-      </div>
-      <div class="top-actions">
-        <a class="nav-link" href="./prototype-review.html">返回审核页</a>
-        <a class="nav-link" href="./prototype-result.html">查看结果页</a>
-        <span class="chip primary">已命中 42 张</span>
-      </div>
-    </div>
-
-    <section class="filter-layout">
-      <aside class="sidebar">
-        <div class="section-title">
-          <h3>筛选条件</h3>
-          <span class="button ghost">清空条件</span>
-        </div>
-
-        <div class="filter-grid">
-          <div class="filter-box">
-            <h4>处理结论</h4>
-            <div class="tag-row">
-              <span class="chip primary">全部</span>
-              <span class="chip">通过</span>
-              <span class="chip">待定</span>
-              <span class="chip">淘汰</span>
-            </div>
-          </div>
-
-          <div class="filter-box">
-            <h4>分类</h4>
-            <div class="tag-row">
-              <span class="chip primary">AI 生成图</span>
-              <span class="chip">设计稿截图</span>
-              <span class="chip">活动素材</span>
-              <span class="chip">参考图</span>
-            </div>
-          </div>
-
-          <div class="filter-box">
-            <h4>备注</h4>
-            <div class="tag-row">
-              <span class="chip">仅看有备注</span>
-              <span class="chip">仅看无备注</span>
-            </div>
-          </div>
-
-          <div class="filter-box">
-            <h4>搜索</h4>
-            <div class="note-box">按文件名或备注关键词搜索</div>
-          </div>
-        </div>
-      </aside>
-
-      <main class="review-main">
-        <div class="results-summary">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>原型 - 结果筛选</title>
+    <link rel="stylesheet" href="./prototype.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
           <div>
-            <h3>筛选结果</h3>
-            <p class="muted">网格里直接看状态、分类和备注情况</p>
-          </div>
-          <div class="tabs">
-            <span class="chip primary">网格视图</span>
-            <span class="chip">紧凑视图</span>
+            <h2>结果筛选</h2>
+            <p class="muted">按结论、分类和备注快速筛出目标图片</p>
           </div>
         </div>
-
-        <div class="result-grid">
-          <article class="result-card">
-            <div class="result-image"></div>
-            <div class="content">
-              <h3>IMG_0202.png</h3>
-              <div class="meta-row">
-                <span class="badge keep">通过</span>
-                <span class="badge neutral">AI 生成图</span>
-                <span class="badge neutral">有备注</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="result-card">
-            <div class="result-image"></div>
-            <div class="content">
-              <h3>IMG_0211.png</h3>
-              <div class="meta-row">
-                <span class="badge keep">通过</span>
-                <span class="badge neutral">设计稿截图</span>
-                <span class="badge neutral">无备注</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="result-card">
-            <div class="result-image"></div>
-            <div class="content">
-              <h3>IMG_0228.png</h3>
-              <div class="meta-row">
-                <span class="badge pending">待定</span>
-                <span class="badge neutral">活动素材</span>
-                <span class="badge neutral">有备注</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="result-card">
-            <div class="result-image"></div>
-            <div class="content">
-              <h3>IMG_0240.png</h3>
-              <div class="meta-row">
-                <span class="badge reject">淘汰</span>
-                <span class="badge neutral">参考图</span>
-                <span class="badge neutral">无备注</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="result-card">
-            <div class="result-image"></div>
-            <div class="content">
-              <h3>IMG_0253.png</h3>
-              <div class="meta-row">
-                <span class="badge pending">待定</span>
-                <span class="badge neutral">AI 生成图</span>
-                <span class="badge neutral">有备注</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="result-card">
-            <div class="result-image"></div>
-            <div class="content">
-              <h3>IMG_0258.png</h3>
-              <div class="meta-row">
-                <span class="badge keep">通过</span>
-                <span class="badge neutral">活动素材</span>
-                <span class="badge neutral">有备注</span>
-              </div>
-            </div>
-          </article>
+        <div class="top-actions">
+          <a class="nav-link" href="./prototype-review.html">返回审核页</a>
+          <a class="nav-link" href="./prototype-result.html">查看结果页</a>
+          <span class="chip primary">已命中 42 张</span>
         </div>
-      </main>
+      </div>
 
-      <aside class="inspector">
-        <div class="section-title">
-          <h3>快速预览</h3>
-          <span class="badge keep">定位到审核页</span>
-        </div>
-        <div class="preview-image" style="height: 260px;"></div>
+      <section class="filter-layout">
+        <aside class="sidebar">
+          <div class="section-title">
+            <h3>筛选条件</h3>
+            <span class="button ghost">清空条件</span>
+          </div>
 
-        <section class="form-block" style="margin-top: 14px;">
-          <h4>当前命中项摘要</h4>
-          <div class="bar-list">
-            <div class="bar-row">
-              <span>通过</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 64%; background: #22a06b;"></div></div>
-              <strong>27</strong>
+          <div class="filter-grid">
+            <div class="filter-box">
+              <h4>处理结论</h4>
+              <div class="tag-row">
+                <span class="chip primary">全部</span>
+                <span class="chip">通过</span>
+                <span class="chip">待定</span>
+                <span class="chip">淘汰</span>
+              </div>
             </div>
-            <div class="bar-row">
-              <span>待定</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 22%; background: #f5a524;"></div></div>
-              <strong>9</strong>
+
+            <div class="filter-box">
+              <h4>分类</h4>
+              <div class="tag-row">
+                <span class="chip primary">AI 生成图</span>
+                <span class="chip">设计稿截图</span>
+                <span class="chip">活动素材</span>
+                <span class="chip">参考图</span>
+              </div>
             </div>
-            <div class="bar-row">
-              <span>有备注</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 36%; background: #2f6bff;"></div></div>
-              <strong>15</strong>
+
+            <div class="filter-box">
+              <h4>备注</h4>
+              <div class="tag-row">
+                <span class="chip">仅看有备注</span>
+                <span class="chip">仅看无备注</span>
+              </div>
+            </div>
+
+            <div class="filter-box">
+              <h4>搜索</h4>
+              <div class="note-box">按文件名或备注关键词搜索</div>
             </div>
           </div>
-        </section>
+        </aside>
 
-        <section class="form-block">
-          <h4>当前图片信息</h4>
-          <div class="textarea">
-            结论：通过
-            分类：AI 生成图
-            备注：光影和主体都比较稳定，可以直接进入最终结果页继续确认。
+        <main class="review-main">
+          <div class="results-summary">
+            <div>
+              <h3>筛选结果</h3>
+              <p class="muted">网格里直接看状态、分类和备注情况</p>
+            </div>
+            <div class="tabs">
+              <span class="chip primary">网格视图</span>
+              <span class="chip">紧凑视图</span>
+            </div>
           </div>
-        </section>
-      </aside>
-    </section>
-  </div>
-</body>
+
+          <div class="result-grid">
+            <article class="result-card">
+              <div class="result-image"></div>
+              <div class="content">
+                <h3>IMG_0202.png</h3>
+                <div class="meta-row">
+                  <span class="badge keep">通过</span>
+                  <span class="badge neutral">AI 生成图</span>
+                  <span class="badge neutral">有备注</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card">
+              <div class="result-image"></div>
+              <div class="content">
+                <h3>IMG_0211.png</h3>
+                <div class="meta-row">
+                  <span class="badge keep">通过</span>
+                  <span class="badge neutral">设计稿截图</span>
+                  <span class="badge neutral">无备注</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card">
+              <div class="result-image"></div>
+              <div class="content">
+                <h3>IMG_0228.png</h3>
+                <div class="meta-row">
+                  <span class="badge pending">待定</span>
+                  <span class="badge neutral">活动素材</span>
+                  <span class="badge neutral">有备注</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card">
+              <div class="result-image"></div>
+              <div class="content">
+                <h3>IMG_0240.png</h3>
+                <div class="meta-row">
+                  <span class="badge reject">淘汰</span>
+                  <span class="badge neutral">参考图</span>
+                  <span class="badge neutral">无备注</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card">
+              <div class="result-image"></div>
+              <div class="content">
+                <h3>IMG_0253.png</h3>
+                <div class="meta-row">
+                  <span class="badge pending">待定</span>
+                  <span class="badge neutral">AI 生成图</span>
+                  <span class="badge neutral">有备注</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="result-card">
+              <div class="result-image"></div>
+              <div class="content">
+                <h3>IMG_0258.png</h3>
+                <div class="meta-row">
+                  <span class="badge keep">通过</span>
+                  <span class="badge neutral">活动素材</span>
+                  <span class="badge neutral">有备注</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </main>
+
+        <aside class="inspector">
+          <div class="section-title">
+            <h3>快速预览</h3>
+            <span class="badge keep">定位到审核页</span>
+          </div>
+          <div class="preview-image" style="height: 260px"></div>
+
+          <section class="form-block" style="margin-top: 14px">
+            <h4>当前命中项摘要</h4>
+            <div class="bar-list">
+              <div class="bar-row">
+                <span>通过</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width: 64%; background: #22a06b"></div>
+                </div>
+                <strong>27</strong>
+              </div>
+              <div class="bar-row">
+                <span>待定</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width: 22%; background: #f5a524"></div>
+                </div>
+                <strong>9</strong>
+              </div>
+              <div class="bar-row">
+                <span>有备注</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width: 36%; background: #2f6bff"></div>
+                </div>
+                <strong>15</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-block">
+            <h4>当前图片信息</h4>
+            <div class="textarea">
+              结论：通过 分类：AI 生成图
+              备注：光影和主体都比较稳定，可以直接进入最终结果页继续确认。
+            </div>
+          </section>
+        </aside>
+      </section>
+    </div>
+  </body>
 </html>

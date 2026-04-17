@@ -1,6 +1,10 @@
 import type { ProjectSummary, ReviewDecision, ReviewFilter } from '@renderer/app/types/review'
 
-export const REVIEW_DECISION_OPTIONS: Array<{ label: string; value: ReviewDecision; color: string }> = [
+export const REVIEW_DECISION_OPTIONS: Array<{
+  label: string
+  value: ReviewDecision
+  color: string
+}> = [
   { label: '通过', value: 'approved', color: 'green' },
   { label: '待定', value: 'pending', color: 'gold' },
   { label: '淘汰', value: 'rejected', color: 'red' }

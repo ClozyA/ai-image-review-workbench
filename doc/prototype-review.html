@@ -1,186 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>原型 - 审核工作台</title>
-  <link rel="stylesheet" href="./prototype.css" />
-</head>
-<body>
-  <div class="shell">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-mark">AI</div>
-        <div>
-          <h2>春季广告图筛选</h2>
-          <p class="muted">审核工作台 · 186 张图片 · 当前 23 / 186 · 已处理 68%</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>原型 - 审核工作台</title>
+    <link rel="stylesheet" href="./prototype.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <h2>春季广告图筛选</h2>
+            <p class="muted">审核工作台 · 186 张图片 · 当前 23 / 186 · 已处理 68%</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a class="nav-link" href="./prototype-home.html">返回首页</a>
+          <a class="nav-link" href="./prototype-filter.html">维度筛选</a>
+          <a class="nav-link" href="./prototype-result.html">结果页</a>
+          <span class="status"><span class="dot"></span>已保存</span>
         </div>
       </div>
-      <div class="top-actions">
-        <a class="nav-link" href="./prototype-home.html">返回首页</a>
-        <a class="nav-link" href="./prototype-filter.html">维度筛选</a>
-        <a class="nav-link" href="./prototype-result.html">结果页</a>
-        <span class="status"><span class="dot"></span>已保存</span>
-      </div>
+
+      <section class="workspace">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div>
+              <h3>图片列表</h3>
+              <p class="muted">适合批量浏览和快速切换</p>
+            </div>
+            <span class="chip">23 / 186</span>
+          </div>
+
+          <section class="form-block">
+            <h4>快速筛选</h4>
+            <div class="tag-row">
+              <span class="chip primary">全部</span>
+              <span class="chip">未处理</span>
+              <span class="chip">通过</span>
+              <span class="chip">待定</span>
+              <span class="chip">淘汰</span>
+            </div>
+          </section>
+
+          <div class="thumb-list">
+            <article class="thumb-card">
+              <div class="thumb-image"></div>
+              <div class="thumb-info">
+                <h4>IMG_0201.png</h4>
+                <div class="meta-row">
+                  <span class="badge neutral">未处理</span>
+                  <span class="badge neutral">未分类</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="thumb-card active">
+              <div class="thumb-image"></div>
+              <div class="thumb-info">
+                <h4>IMG_0202.png</h4>
+                <div class="meta-row">
+                  <span class="badge keep">通过</span>
+                  <span class="badge neutral">AI 生成图</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="thumb-card">
+              <div class="thumb-image"></div>
+              <div class="thumb-info">
+                <h4>IMG_0203.png</h4>
+                <div class="meta-row">
+                  <span class="badge pending">待定</span>
+                  <span class="badge neutral">设计稿截图</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="thumb-card">
+              <div class="thumb-image"></div>
+              <div class="thumb-info">
+                <h4>IMG_0204.png</h4>
+                <div class="meta-row">
+                  <span class="badge reject">淘汰</span>
+                  <span class="badge neutral">活动素材</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="thumb-card">
+              <div class="thumb-image"></div>
+              <div class="thumb-info">
+                <h4>IMG_0205.png</h4>
+                <div class="meta-row">
+                  <span class="badge neutral">未处理</span>
+                  <span class="badge neutral">参考图</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <main class="review-main">
+          <div class="review-header">
+            <div>
+              <h3>当前图片预览</h3>
+              <p class="muted">中间只负责看图，右侧只保留结论和分类选择</p>
+            </div>
+            <div class="toolbar">
+              <span class="button">上一张</span>
+              <span class="button">适应窗口</span>
+              <span class="button">100%</span>
+            </div>
+          </div>
+
+          <div class="preview-image"></div>
+
+          <div class="image-meta">
+            <div class="info-box">
+              <div class="muted">文件名</div>
+              <strong>IMG_0202.png</strong>
+            </div>
+            <div class="info-box">
+              <div class="muted">分辨率</div>
+              <strong>4096 × 4096</strong>
+            </div>
+            <div class="info-box">
+              <div class="muted">文件大小</div>
+              <strong>8.4 MB</strong>
+            </div>
+            <div class="info-box">
+              <div class="muted">修改时间</div>
+              <strong>2026-04-15</strong>
+            </div>
+          </div>
+        </main>
+
+        <aside class="inspector">
+          <div class="inspector-header">
+            <div>
+              <h3>审核面板</h3>
+              <p class="muted">只做结论和分类，尽量简单</p>
+            </div>
+            <span class="chip primary">自动保存</span>
+          </div>
+
+          <section class="form-block">
+            <h4>处理结论</h4>
+            <div class="segmented">
+              <span class="button primary">通过</span>
+              <span class="button">待定</span>
+              <span class="button">淘汰</span>
+            </div>
+          </section>
+
+          <section class="form-block">
+            <h4>分类</h4>
+            <div class="tag-row">
+              <span class="chip primary">AI 生成图</span>
+              <span class="chip">设计稿截图</span>
+              <span class="chip">活动素材</span>
+              <span class="chip">参考图</span>
+            </div>
+          </section>
+
+          <section class="form-block">
+            <h4>备注</h4>
+            <div class="textarea">
+              这里可以填写简单备注，比如补充为什么待定，或者说明这张图后续要怎么处理。
+            </div>
+          </section>
+
+          <section class="form-block">
+            <h4>继续处理</h4>
+            <div class="action-stack">
+              <span class="button primary">下一张</span>
+            </div>
+          </section>
+        </aside>
+      </section>
     </div>
-
-    <section class="workspace">
-      <aside class="sidebar">
-        <div class="sidebar-header">
-          <div>
-            <h3>图片列表</h3>
-            <p class="muted">适合批量浏览和快速切换</p>
-          </div>
-          <span class="chip">23 / 186</span>
-        </div>
-
-        <section class="form-block">
-          <h4>快速筛选</h4>
-          <div class="tag-row">
-            <span class="chip primary">全部</span>
-            <span class="chip">未处理</span>
-            <span class="chip">通过</span>
-            <span class="chip">待定</span>
-            <span class="chip">淘汰</span>
-          </div>
-        </section>
-
-        <div class="thumb-list">
-          <article class="thumb-card">
-            <div class="thumb-image"></div>
-            <div class="thumb-info">
-              <h4>IMG_0201.png</h4>
-              <div class="meta-row">
-                <span class="badge neutral">未处理</span>
-                <span class="badge neutral">未分类</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="thumb-card active">
-            <div class="thumb-image"></div>
-            <div class="thumb-info">
-              <h4>IMG_0202.png</h4>
-              <div class="meta-row">
-                <span class="badge keep">通过</span>
-                <span class="badge neutral">AI 生成图</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="thumb-card">
-            <div class="thumb-image"></div>
-            <div class="thumb-info">
-              <h4>IMG_0203.png</h4>
-              <div class="meta-row">
-                <span class="badge pending">待定</span>
-                <span class="badge neutral">设计稿截图</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="thumb-card">
-            <div class="thumb-image"></div>
-            <div class="thumb-info">
-              <h4>IMG_0204.png</h4>
-              <div class="meta-row">
-                <span class="badge reject">淘汰</span>
-                <span class="badge neutral">活动素材</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="thumb-card">
-            <div class="thumb-image"></div>
-            <div class="thumb-info">
-              <h4>IMG_0205.png</h4>
-              <div class="meta-row">
-                <span class="badge neutral">未处理</span>
-                <span class="badge neutral">参考图</span>
-              </div>
-            </div>
-          </article>
-        </div>
-      </aside>
-
-      <main class="review-main">
-        <div class="review-header">
-          <div>
-            <h3>当前图片预览</h3>
-            <p class="muted">中间只负责看图，右侧只保留结论和分类选择</p>
-          </div>
-          <div class="toolbar">
-            <span class="button">上一张</span>
-            <span class="button">适应窗口</span>
-            <span class="button">100%</span>
-          </div>
-        </div>
-
-        <div class="preview-image"></div>
-
-        <div class="image-meta">
-          <div class="info-box">
-            <div class="muted">文件名</div>
-            <strong>IMG_0202.png</strong>
-          </div>
-          <div class="info-box">
-            <div class="muted">分辨率</div>
-            <strong>4096 × 4096</strong>
-          </div>
-          <div class="info-box">
-            <div class="muted">文件大小</div>
-            <strong>8.4 MB</strong>
-          </div>
-          <div class="info-box">
-            <div class="muted">修改时间</div>
-            <strong>2026-04-15</strong>
-          </div>
-        </div>
-      </main>
-
-      <aside class="inspector">
-        <div class="inspector-header">
-          <div>
-            <h3>审核面板</h3>
-            <p class="muted">只做结论和分类，尽量简单</p>
-          </div>
-          <span class="chip primary">自动保存</span>
-        </div>
-
-        <section class="form-block">
-          <h4>处理结论</h4>
-          <div class="segmented">
-            <span class="button primary">通过</span>
-            <span class="button">待定</span>
-            <span class="button">淘汰</span>
-          </div>
-        </section>
-
-        <section class="form-block">
-          <h4>分类</h4>
-          <div class="tag-row">
-            <span class="chip primary">AI 生成图</span>
-            <span class="chip">设计稿截图</span>
-            <span class="chip">活动素材</span>
-            <span class="chip">参考图</span>
-          </div>
-        </section>
-
-        <section class="form-block">
-          <h4>备注</h4>
-          <div class="textarea">
-            这里可以填写简单备注，比如补充为什么待定，或者说明这张图后续要怎么处理。
-          </div>
-        </section>
-
-        <section class="form-block">
-          <h4>继续处理</h4>
-          <div class="action-stack">
-            <span class="button primary">下一张</span>
-          </div>
-        </section>
-      </aside>
-    </section>
-  </div>
-</body>
+  </body>
 </html>

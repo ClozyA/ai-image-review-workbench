@@ -78,7 +78,14 @@ export const mockAssets: ImageAsset[] = [
 ]
 
 export const mockReviews: AssetReview[] = [
-  { assetId: 'asset-001', projectId: 'project-001', decision: 'unreviewed', favorite: false, comment: '', updatedAt: '2026-04-16T12:00:00.000Z' },
+  {
+    assetId: 'asset-001',
+    projectId: 'project-001',
+    decision: 'unreviewed',
+    favorite: false,
+    comment: '',
+    updatedAt: '2026-04-16T12:00:00.000Z'
+  },
   {
     assetId: 'asset-002',
     projectId: 'project-001',

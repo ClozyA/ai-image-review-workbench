@@ -22,7 +22,9 @@ export function buildProjectSnapshotForExport(
     reviews: reviews
       .filter((review) => review.projectId === project.id)
       .map((review) => ({ ...review })),
-    uiState: uiState ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined } : undefined
+    uiState: uiState
+      ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined }
+      : undefined
   }
 }
 

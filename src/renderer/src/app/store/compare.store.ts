@@ -7,7 +7,10 @@ export const useCompareStore = defineStore('compare', () => {
   const compareAssetIdsByProject = ref<Record<ProjectId, AssetId[]>>({})
 
   const totalComparedCount = computed(() =>
-    Object.values(compareAssetIdsByProject.value).reduce((sum, assetIds) => sum + assetIds.length, 0)
+    Object.values(compareAssetIdsByProject.value).reduce(
+      (sum, assetIds) => sum + assetIds.length,
+      0
+    )
   )
 
   function getProjectCompareAssetIds(projectId: ProjectId): AssetId[] {

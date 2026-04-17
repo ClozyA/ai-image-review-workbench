@@ -112,7 +112,12 @@
           </a-space>
         </div>
 
-        <div v-if="filteredItems.length" ref="filterResultListRef" class="result-list filter-result-list" @scroll="handleFilterResultScroll">
+        <div
+          v-if="filteredItems.length"
+          ref="filterResultListRef"
+          class="result-list filter-result-list"
+          @scroll="handleFilterResultScroll"
+        >
           <article v-for="item in filteredItems" :key="item.asset.id" class="result-item">
             <img
               class="result-item-cover"

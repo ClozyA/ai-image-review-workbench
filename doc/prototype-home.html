@@ -1,147 +1,147 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>原型 - 首页书架</title>
-  <link rel="stylesheet" href="./prototype.css" />
-</head>
-<body>
-  <div class="shell">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-mark">AI</div>
-        <div>
-          <h2>项目书架</h2>
-          <p class="muted">项目入口页，强调归档感、进度感和可继续工作</p>
-        </div>
-      </div>
-      <div class="top-actions">
-        <a class="nav-link" href="./prototype-index.html">返回总览</a>
-        <span class="chip">搜索项目</span>
-        <span class="chip">导入评审结果</span>
-        <span class="chip primary">浅色主题</span>
-      </div>
-    </div>
-
-    <section class="hero">
-      <div class="panel panel-pad">
-        <p class="muted">页面定位</p>
-        <h1 class="hero-title">像“项目柜”一样管理图片评审，而不是像浏览器一样找文件。</h1>
-        <p class="hero-copy">
-          顶部只保留高频动作，主体区域用整齐书架卡片承载项目，让用户一进来就知道能继续什么、已经做到了哪一步。
-        </p>
-        <div class="stat-grid">
-          <div class="stat-card">
-            <span class="muted">最近活跃项目</span>
-            <strong>12</strong>
-          </div>
-          <div class="stat-card">
-            <span class="muted">待继续评审</span>
-            <strong>4</strong>
-          </div>
-          <div class="stat-card">
-            <span class="muted">已完成项目</span>
-            <strong>8</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel panel-pad">
-        <div class="section-title">
-          <h3>视觉要点</h3>
-          <span class="badge neutral">一屏完成</span>
-        </div>
-        <div class="note-box">
-          固定尺寸卡片、统一封面比例、轻微悬浮感和明确状态标签，是这一页形成“书架感”的关键。
-        </div>
-      </div>
-    </section>
-
-    <section class="panel panel-pad">
-      <div class="section-title">
-        <h2>我的项目</h2>
-        <div class="actions">
-          <span class="status"><span class="dot"></span>自动保存正常</span>
-          <a class="button ghost" href="./prototype-review.html">查看审核页</a>
-        </div>
-      </div>
-
-      <div class="shelf-grid">
-        <div class="add-card">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>原型 - 首页书架</title>
+    <link rel="stylesheet" href="./prototype.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
           <div>
-            <div class="plus">+</div>
-            <h3>打开文件夹</h3>
-            <p class="muted">新建项目 / 拖拽文件夹到这里</p>
+            <h2>项目书架</h2>
+            <p class="muted">项目入口页，强调归档感、进度感和可继续工作</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a class="nav-link" href="./prototype-index.html">返回总览</a>
+          <span class="chip">搜索项目</span>
+          <span class="chip">导入评审结果</span>
+          <span class="chip primary">浅色主题</span>
+        </div>
+      </div>
+
+      <section class="hero">
+        <div class="panel panel-pad">
+          <p class="muted">页面定位</p>
+          <h1 class="hero-title">像“项目柜”一样管理图片评审，而不是像浏览器一样找文件。</h1>
+          <p class="hero-copy">
+            顶部只保留高频动作，主体区域用整齐书架卡片承载项目，让用户一进来就知道能继续什么、已经做到了哪一步。
+          </p>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <span class="muted">最近活跃项目</span>
+              <strong>12</strong>
+            </div>
+            <div class="stat-card">
+              <span class="muted">待继续评审</span>
+              <strong>4</strong>
+            </div>
+            <div class="stat-card">
+              <span class="muted">已完成项目</span>
+              <strong>8</strong>
+            </div>
           </div>
         </div>
 
-        <article class="project-card">
-          <div class="project-cover"></div>
-          <div class="content">
-            <h3>春季广告图筛选</h3>
-            <p class="muted">186 张图片 · 最近打开 10 分钟前</p>
-            <div class="meta-row">
-              <span class="badge pending">审核中 68%</span>
-              <span class="badge keep">已保留 24 张</span>
-              <span class="badge neutral">已保存</span>
-            </div>
+        <div class="panel panel-pad">
+          <div class="section-title">
+            <h3>视觉要点</h3>
+            <span class="badge neutral">一屏完成</span>
           </div>
-        </article>
+          <div class="note-box">
+            固定尺寸卡片、统一封面比例、轻微悬浮感和明确状态标签，是这一页形成“书架感”的关键。
+          </div>
+        </div>
+      </section>
 
-        <article class="project-card">
-          <div class="project-cover"></div>
-          <div class="content">
-            <h3>品牌 KV 复审</h3>
-            <p class="muted">92 张图片 · 最近打开 昨天</p>
-            <div class="meta-row">
-              <span class="badge keep">已完成</span>
-              <span class="badge keep">保留 15 张</span>
-              <span class="badge neutral">导入外部结果</span>
-            </div>
+      <section class="panel panel-pad">
+        <div class="section-title">
+          <h2>我的项目</h2>
+          <div class="actions">
+            <span class="status"><span class="dot"></span>自动保存正常</span>
+            <a class="button ghost" href="./prototype-review.html">查看审核页</a>
           </div>
-        </article>
+        </div>
 
-        <article class="project-card">
-          <div class="project-cover"></div>
-          <div class="content">
-            <h3>人物风格实验批次 A</h3>
-            <p class="muted">240 张图片 · 最近打开 3 天前</p>
-            <div class="meta-row">
-              <span class="badge reject">有未保存变更</span>
-              <span class="badge pending">待复核 19 张</span>
-              <span class="badge neutral">自定义排序</span>
+        <div class="shelf-grid">
+          <div class="add-card">
+            <div>
+              <div class="plus">+</div>
+              <h3>打开文件夹</h3>
+              <p class="muted">新建项目 / 拖拽文件夹到这里</p>
             </div>
           </div>
-        </article>
 
-        <article class="project-card">
-          <div class="project-cover"></div>
-          <div class="content">
-            <h3>短视频封面候选集</h3>
-            <p class="muted">128 张图片 · 最近打开 1 周前</p>
-            <div class="meta-row">
-              <span class="badge pending">审核中 34%</span>
-              <span class="badge keep">收藏 11 张</span>
-              <span class="badge neutral">继续上次进度</span>
+          <article class="project-card">
+            <div class="project-cover"></div>
+            <div class="content">
+              <h3>春季广告图筛选</h3>
+              <p class="muted">186 张图片 · 最近打开 10 分钟前</p>
+              <div class="meta-row">
+                <span class="badge pending">审核中 68%</span>
+                <span class="badge keep">已保留 24 张</span>
+                <span class="badge neutral">已保存</span>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
 
-        <article class="project-card">
-          <div class="project-cover"></div>
-          <div class="content">
-            <h3>电商主图筛选</h3>
-            <p class="muted">315 张图片 · 最近打开 2 周前</p>
-            <div class="meta-row">
-              <span class="badge keep">已完成</span>
-              <span class="badge keep">高分图 32 张</span>
-              <span class="badge neutral">可导出报告</span>
+          <article class="project-card">
+            <div class="project-cover"></div>
+            <div class="content">
+              <h3>品牌 KV 复审</h3>
+              <p class="muted">92 张图片 · 最近打开 昨天</p>
+              <div class="meta-row">
+                <span class="badge keep">已完成</span>
+                <span class="badge keep">保留 15 张</span>
+                <span class="badge neutral">导入外部结果</span>
+              </div>
             </div>
-          </div>
-        </article>
-      </div>
-    </section>
-  </div>
-</body>
+          </article>
+
+          <article class="project-card">
+            <div class="project-cover"></div>
+            <div class="content">
+              <h3>人物风格实验批次 A</h3>
+              <p class="muted">240 张图片 · 最近打开 3 天前</p>
+              <div class="meta-row">
+                <span class="badge reject">有未保存变更</span>
+                <span class="badge pending">待复核 19 张</span>
+                <span class="badge neutral">自定义排序</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-cover"></div>
+            <div class="content">
+              <h3>短视频封面候选集</h3>
+              <p class="muted">128 张图片 · 最近打开 1 周前</p>
+              <div class="meta-row">
+                <span class="badge pending">审核中 34%</span>
+                <span class="badge keep">收藏 11 张</span>
+                <span class="badge neutral">继续上次进度</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-cover"></div>
+            <div class="content">
+              <h3>电商主图筛选</h3>
+              <p class="muted">315 张图片 · 最近打开 2 周前</p>
+              <div class="meta-row">
+                <span class="badge keep">已完成</span>
+                <span class="badge keep">高分图 32 张</span>
+                <span class="badge neutral">可导出报告</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </body>
 </html>

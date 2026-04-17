@@ -1,183 +1,203 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>原型 - 结果展示</title>
-  <link rel="stylesheet" href="./prototype.css" />
-</head>
-<body>
-  <div class="shell">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-mark">AI</div>
-        <div>
-          <h2>结果展示页</h2>
-          <p class="muted">结论统计、分类分布和备注摘要集中展示</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>原型 - 结果展示</title>
+    <link rel="stylesheet" href="./prototype.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <h2>结果展示页</h2>
+            <p class="muted">结论统计、分类分布和备注摘要集中展示</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a class="nav-link" href="./prototype-filter.html">返回筛选页</a>
+          <a class="nav-link" href="./prototype-review.html">继续审核</a>
+          <span class="chip primary">导出中心</span>
         </div>
       </div>
-      <div class="top-actions">
-        <a class="nav-link" href="./prototype-filter.html">返回筛选页</a>
-        <a class="nav-link" href="./prototype-review.html">继续审核</a>
-        <span class="chip primary">导出中心</span>
-      </div>
-    </div>
 
-    <section class="hero">
-      <div class="panel panel-pad">
-        <p class="muted">项目结论</p>
-        <h1 class="hero-title">这一轮图片处理已经形成清晰结论，可以直接继续导出或交付。</h1>
-        <p class="hero-copy">
-          这页只关心最终有多少图片通过、待定、淘汰，以及它们主要属于哪一类、有哪些备注需要继续关注。
-        </p>
-      </div>
+      <section class="hero">
+        <div class="panel panel-pad">
+          <p class="muted">项目结论</p>
+          <h1 class="hero-title">这一轮图片处理已经形成清晰结论，可以直接继续导出或交付。</h1>
+          <p class="hero-copy">
+            这页只关心最终有多少图片通过、待定、淘汰，以及它们主要属于哪一类、有哪些备注需要继续关注。
+          </p>
+        </div>
 
-      <div class="panel panel-pad">
+        <div class="panel panel-pad">
+          <div class="section-title">
+            <h3>评审总结</h3>
+            <span class="badge keep">已完成</span>
+          </div>
+          <div class="note-box">
+            本轮共处理 186 张图，其中通过 31 张，待定 12 张，淘汰 143 张。 当前通过图片主要集中在 AI
+            生成图和活动素材，待定项大多已经补充备注，便于下一轮快速复核。
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-pad">
         <div class="section-title">
-          <h3>评审总结</h3>
-          <span class="badge keep">已完成</span>
+          <h2>结果概览</h2>
+          <div class="tabs">
+            <span class="chip primary">总览</span>
+            <span class="chip">通过结果</span>
+            <span class="chip">待定</span>
+            <span class="chip">分类统计</span>
+            <span class="chip">导出</span>
+          </div>
         </div>
-        <div class="note-box">
-          本轮共处理 186 张图，其中通过 31 张，待定 12 张，淘汰 143 张。
-          当前通过图片主要集中在 AI 生成图和活动素材，待定项大多已经补充备注，便于下一轮快速复核。
-        </div>
-      </div>
-    </section>
 
-    <section class="panel panel-pad">
-      <div class="section-title">
-        <h2>结果概览</h2>
-        <div class="tabs">
-          <span class="chip primary">总览</span>
-          <span class="chip">通过结果</span>
-          <span class="chip">待定</span>
-          <span class="chip">分类统计</span>
-          <span class="chip">导出</span>
-        </div>
-      </div>
-
-      <div class="summary-grid">
-        <div class="metric-card">
-          <span class="muted">总图片数</span>
-          <strong>186</strong>
-        </div>
-        <div class="metric-card">
-          <span class="muted">已处理</span>
-          <strong>174</strong>
-        </div>
-        <div class="metric-card">
-          <span class="muted">通过</span>
-          <strong>31</strong>
-        </div>
-        <div class="metric-card">
-          <span class="muted">待定</span>
-          <strong>12</strong>
-        </div>
-      </div>
-    </section>
-
-    <section class="metric-grid" style="margin-top: 18px;">
-      <div class="chart-box">
-        <h3>处理结论统计</h3>
-        <div class="bar-list">
-          <div class="bar-row">
-            <span>通过</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 62%; background: #22a06b;"></div></div>
+        <div class="summary-grid">
+          <div class="metric-card">
+            <span class="muted">总图片数</span>
+            <strong>186</strong>
+          </div>
+          <div class="metric-card">
+            <span class="muted">已处理</span>
+            <strong>174</strong>
+          </div>
+          <div class="metric-card">
+            <span class="muted">通过</span>
             <strong>31</strong>
           </div>
-          <div class="bar-row">
-            <span>待定</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 24%; background: #f5a524;"></div></div>
-            <strong>12</strong>
-          </div>
-          <div class="bar-row">
-            <span>淘汰</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 80%; background: #e5484d;"></div></div>
-            <strong>143</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-box">
-        <h3>分类统计</h3>
-        <div class="bar-list">
-          <div class="bar-row">
-            <span>AI 生成图</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 58%; background: #2f6bff;"></div></div>
-            <strong>46</strong>
-          </div>
-          <div class="bar-row">
-            <span>设计稿截图</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 32%; background: #22a06b;"></div></div>
-            <strong>18</strong>
-          </div>
-          <div class="bar-row">
-            <span>活动素材</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 44%; background: #f5a524;"></div></div>
-            <strong>27</strong>
-          </div>
-          <div class="bar-row">
-            <span>参考图</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 26%; background: #94a0b8;"></div></div>
+          <div class="metric-card">
+            <span class="muted">待定</span>
             <strong>12</strong>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="chart-box">
-        <h3>备注概览</h3>
-        <div class="bar-list">
-          <div class="bar-row">
-            <span>有备注</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 40%; background: #2f6bff;"></div></div>
-            <strong>67</strong>
-          </div>
-          <div class="bar-row">
-            <span>待定且有备注</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 18%; background: #f5a524;"></div></div>
-            <strong>9</strong>
-          </div>
-          <div class="bar-row">
-            <span>通过且有备注</span>
-            <div class="bar-track"><div class="bar-fill" style="width: 22%; background: #22a06b;"></div></div>
-            <strong>14</strong>
+      <section class="metric-grid" style="margin-top: 18px">
+        <div class="chart-box">
+          <h3>处理结论统计</h3>
+          <div class="bar-list">
+            <div class="bar-row">
+              <span>通过</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 62%; background: #22a06b"></div>
+              </div>
+              <strong>31</strong>
+            </div>
+            <div class="bar-row">
+              <span>待定</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 24%; background: #f5a524"></div>
+              </div>
+              <strong>12</strong>
+            </div>
+            <div class="bar-row">
+              <span>淘汰</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 80%; background: #e5484d"></div>
+              </div>
+              <strong>143</strong>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="chart-box">
-        <h3>备注摘要</h3>
-        <div class="note-box">
-          1. 待定图片多数备注集中在“边缘细节”和“文字排版”。
-          2. 通过图片的备注主要用于记录后续导出用途。
-          3. 活动素材类图片需要优先二次确认尺寸和文案留白。
+        <div class="chart-box">
+          <h3>分类统计</h3>
+          <div class="bar-list">
+            <div class="bar-row">
+              <span>AI 生成图</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 58%; background: #2f6bff"></div>
+              </div>
+              <strong>46</strong>
+            </div>
+            <div class="bar-row">
+              <span>设计稿截图</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 32%; background: #22a06b"></div>
+              </div>
+              <strong>18</strong>
+            </div>
+            <div class="bar-row">
+              <span>活动素材</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 44%; background: #f5a524"></div>
+              </div>
+              <strong>27</strong>
+            </div>
+            <div class="bar-row">
+              <span>参考图</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 26%; background: #94a0b8"></div>
+              </div>
+              <strong>12</strong>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <section class="panel panel-pad" style="margin-top: 18px;">
-      <div class="section-title">
-        <h2>导出能力</h2>
-        <span class="muted">支持汇报、存档、迁移和继续协作</span>
-      </div>
-      <div class="export-grid">
-        <div class="mini-card">
-          <h3>图片清单导出</h3>
-          <p class="muted">导出通过图、待定图或任意筛选结果，用于交接和复核。</p>
-          <span class="button primary">导出清单</span>
+        <div class="chart-box">
+          <h3>备注概览</h3>
+          <div class="bar-list">
+            <div class="bar-row">
+              <span>有备注</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 40%; background: #2f6bff"></div>
+              </div>
+              <strong>67</strong>
+            </div>
+            <div class="bar-row">
+              <span>待定且有备注</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 18%; background: #f5a524"></div>
+              </div>
+              <strong>9</strong>
+            </div>
+            <div class="bar-row">
+              <span>通过且有备注</span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: 22%; background: #22a06b"></div>
+              </div>
+              <strong>14</strong>
+            </div>
+          </div>
         </div>
-        <div class="mini-card">
-          <h3>评审报告导出</h3>
-          <p class="muted">带结论统计、分类分布和备注摘要，适合内部汇报或归档记录。</p>
-          <span class="button primary">导出报告</span>
+
+        <div class="chart-box">
+          <h3>备注摘要</h3>
+          <div class="note-box">
+            1. 待定图片多数备注集中在“边缘细节”和“文字排版”。 2.
+            通过图片的备注主要用于记录后续导出用途。 3.
+            活动素材类图片需要优先二次确认尺寸和文案留白。
+          </div>
         </div>
-        <div class="mini-card">
-          <h3>完整结果包</h3>
-          <p class="muted">包含分类、处理结论和备注，方便别人在另一台机器继续复核。</p>
-          <span class="button primary">导出结果包</span>
+      </section>
+
+      <section class="panel panel-pad" style="margin-top: 18px">
+        <div class="section-title">
+          <h2>导出能力</h2>
+          <span class="muted">支持汇报、存档、迁移和继续协作</span>
         </div>
-      </div>
-    </section>
-  </div>
-</body>
+        <div class="export-grid">
+          <div class="mini-card">
+            <h3>图片清单导出</h3>
+            <p class="muted">导出通过图、待定图或任意筛选结果，用于交接和复核。</p>
+            <span class="button primary">导出清单</span>
+          </div>
+          <div class="mini-card">
+            <h3>评审报告导出</h3>
+            <p class="muted">带结论统计、分类分布和备注摘要，适合内部汇报或归档记录。</p>
+            <span class="button primary">导出报告</span>
+          </div>
+          <div class="mini-card">
+            <h3>完整结果包</h3>
+            <p class="muted">包含分类、处理结论和备注，方便别人在另一台机器继续复核。</p>
+            <span class="button primary">导出结果包</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
 </html>

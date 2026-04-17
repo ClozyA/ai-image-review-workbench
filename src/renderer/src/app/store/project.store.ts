@@ -65,7 +65,11 @@ export const useProjectStore = defineStore('project', () => {
     currentProjectId.value = projectId
   }
 
-  function refreshSummary(projectId: ProjectId, assets: ImageAsset[], reviews: AssetReview[]): void {
+  function refreshSummary(
+    projectId: ProjectId,
+    assets: ImageAsset[],
+    reviews: AssetReview[]
+  ): void {
     summaries.value[projectId] = buildSummary(assets, reviews)
   }
 

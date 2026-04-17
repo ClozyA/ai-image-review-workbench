@@ -5,7 +5,6 @@ import { dirname } from 'path'
 import { hydrateSnapshotThumbnails, type ReviewProjectSnapshot } from './project-scanner'
 import { ExportPayload } from './export-service'
 
-
 export async function importLocalBackupJson(
   thumbnailBaseDir: string
 ): Promise<ReviewProjectSnapshot | null> {
@@ -153,7 +152,10 @@ function normalizeUiState(
             .filter((item, index, arr) => arr.indexOf(item) === index),
           categories: value.filter.categories
             .map((item) => normalizeCategory(item))
-            .filter((item): item is NonNullable<ReviewProjectSnapshot['reviews'][number]['category']> => Boolean(item)),
+            .filter(
+              (item): item is NonNullable<ReviewProjectSnapshot['reviews'][number]['category']> =>
+                Boolean(item)
+            ),
           hasComment: value.filter.hasComment,
           keyword: value.filter.keyword
         }

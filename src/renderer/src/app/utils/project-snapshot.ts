@@ -17,8 +17,12 @@ export function buildProjectSnapshot(
   return {
     project: { ...project },
     assets: assets.filter((asset) => asset.projectId === project.id).map((asset) => ({ ...asset })),
-    reviews: reviews.filter((review) => review.projectId === project.id).map((review) => ({ ...review })),
-    uiState: uiState ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined } : undefined
+    reviews: reviews
+      .filter((review) => review.projectId === project.id)
+      .map((review) => ({ ...review })),
+    uiState: uiState
+      ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined }
+      : undefined
   }
 }
 
