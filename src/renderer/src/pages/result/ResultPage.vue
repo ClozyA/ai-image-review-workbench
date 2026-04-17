@@ -3,7 +3,6 @@
     <header class="app-header">
       <div>
         <h1 class="page-title">结果页</h1>
-        <p class="page-subtitle">当前版本先聚焦结论统计、分类分布和备注概览。</p>
       </div>
       <a-space>
         <a-button @click="goFilter">返回筛选页</a-button>
@@ -12,6 +11,20 @@
     </header>
 
     <main class="page-section">
+      <section class="page-card project-context-card">
+        <div class="section-header">
+          <h2>当前项目</h2>
+        </div>
+        <div class="project-context-grid">
+          <div class="meta-card">
+            <span>项目名称</span>
+            <strong class="meta-file-name" :title="currentProject?.name ?? '-'">
+              {{ currentProject?.name ?? '未选择项目' }}
+            </strong>
+          </div>
+        </div>
+      </section>
+
       <section class="page-card">
         <div class="section-header">
           <h2>结果概览</h2>
@@ -97,6 +110,7 @@ const projectStore = useProjectStore()
 const reviewStore = useReviewStore()
 
 const summary = computed(() => projectStore.currentSummary)
+const currentProject = computed(() => projectStore.currentProject)
 
 const commentedItems = computed(() =>
   assetStore.assets

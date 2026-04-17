@@ -47,6 +47,7 @@ body {
 .page-section {
   display: grid;
   gap: 20px;
+  min-height: 0;
 }
 
 .page-card {
@@ -77,10 +78,22 @@ body {
 }
 
 .project-grid,
-.summary-grid {
+.summary-grid,
+.home-summary-grid,
+.project-context-grid,
+.home-hero-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+}
+
+.project-grid,
+.summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.home-summary-grid,
+.project-context-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .project-tile,
@@ -107,6 +120,20 @@ body {
 .project-tile-top {
   display: grid;
   gap: 10px;
+}
+
+.home-shelf-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.project-shelf-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: calc(100vh - 430px);
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .project-tile-add {
@@ -158,6 +185,20 @@ body {
 
 .result-dashboard {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.filter-page-span {
+  grid-column: 1 / -1;
+}
+
+.project-context-card {
+  display: grid;
+  gap: 8px;
+}
+
+.project-context-tip {
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .thumb-list,
@@ -374,9 +415,15 @@ body {
   .result-dashboard,
   .project-grid,
   .summary-grid,
+  .home-summary-grid,
+  .project-context-grid,
   .result-list,
   .meta-grid {
     grid-template-columns: 1fr;
+  }
+
+  .project-shelf-scroll {
+    max-height: none;
   }
 }
 

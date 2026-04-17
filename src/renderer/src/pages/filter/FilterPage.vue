@@ -3,7 +3,6 @@
     <header class="app-header">
       <div>
         <h1 class="page-title">结果筛选</h1>
-        <p class="page-subtitle">只围绕结论、分类和备注进行筛选。</p>
       </div>
       <a-space>
         <a-button @click="goReview">返回审核页</a-button>
@@ -12,6 +11,24 @@
     </header>
 
     <main class="page-section filter-page-grid">
+      <section class="page-card project-context-card filter-page-span">
+        <div class="section-header">
+          <h2>当前项目</h2>
+        </div>
+        <div class="project-context-grid">
+          <div class="meta-card">
+            <span>项目名称</span>
+            <strong class="meta-file-name" :title="currentProject?.name ?? '-'">
+              {{ currentProject?.name ?? '未选择项目' }}
+            </strong>
+          </div>
+          <div class="meta-card">
+            <span>图片数量</span>
+            <strong>{{ currentProject?.assetCount ?? 0 }}</strong>
+          </div>
+        </div>
+      </section>
+
       <section class="page-card">
         <div class="section-header">
           <h2>筛选条件</h2>
@@ -134,6 +151,7 @@ const reviewStore = useReviewStore()
 const filterStore = useFilterStore()
 
 const filter = computed(() => filterStore.filter)
+const currentProject = computed(() => projectStore.currentProject)
 
 const projectItems = computed<AssetViewModel[]>(() =>
   assetStore.assets
