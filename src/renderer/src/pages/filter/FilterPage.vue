@@ -2,7 +2,10 @@
   <div class="app-layout">
     <header class="app-header">
       <div>
-        <h1 class="page-title">结果筛选</h1>
+        <div class="page-title-row">
+          <h1 class="page-title">结果筛选</h1>
+          <a-tag v-if="currentProject?.name" color="blue">当前项目：{{ currentProject.name }}</a-tag>
+        </div>
       </div>
       <a-space>
         <a-button @click="goHome">返回首页</a-button>
@@ -12,24 +15,6 @@
     </header>
 
     <main class="page-section filter-page-grid">
-      <section class="page-card project-context-card filter-page-span">
-        <div class="section-header">
-          <h2>当前项目</h2>
-        </div>
-        <div class="project-context-grid">
-          <div class="meta-card">
-            <span>项目名称</span>
-            <strong class="meta-file-name" :title="currentProject?.name ?? '-'">
-              {{ currentProject?.name ?? '未选择项目' }}
-            </strong>
-          </div>
-          <div class="meta-card">
-            <span>图片数量</span>
-            <strong>{{ currentProject?.assetCount ?? 0 }}</strong>
-          </div>
-        </div>
-      </section>
-
       <section class="page-card filter-card filter-card-sidebar">
         <div class="section-header">
           <h2>筛选条件</h2>
@@ -102,7 +87,6 @@
         <div class="section-header">
           <h2>筛选结果</h2>
           <a-space>
-            <span class="section-tip">共 {{ filteredItems.length }} 张</span>
             <a-button size="small" :loading="exportingJson" @click="exportFilteredResults('json')">
               导出 JSON
             </a-button>
@@ -136,8 +120,7 @@
           </article>
         </div>
         <div v-else class="filter-empty-state">
-          <strong>没有找到符合条件的图片</strong>
-          <span>可以试试放宽结论、分类或备注条件，或者直接点“重置”恢复全部结果。</span>
+          <strong>暂无结果</strong>
         </div>
       </section>
     </main>

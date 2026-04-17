@@ -14,7 +14,6 @@
       <section class="page-card favorites-card">
         <div class="section-header">
           <h2>收藏图片</h2>
-          <span class="section-tip">共 {{ favoriteItems.length }} 张</span>
         </div>
 
         <div v-if="favoriteItems.length" class="result-list favorites-list">
@@ -43,8 +42,7 @@
           </article>
         </div>
         <div v-else class="filter-empty-state">
-          <strong>收藏夹还是空的</strong>
-          <span>在审核页点一下“加入收藏”，收藏的图片就会出现在这里。</span>
+          <strong>暂无收藏</strong>
         </div>
       </section>
     </main>

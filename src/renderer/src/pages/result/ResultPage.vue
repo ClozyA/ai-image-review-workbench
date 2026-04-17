@@ -2,7 +2,10 @@
   <div class="app-layout">
     <header class="app-header">
       <div>
-        <h1 class="page-title">结果页</h1>
+        <div class="page-title-row">
+          <h1 class="page-title">结果页</h1>
+          <a-tag v-if="currentProject?.name" color="blue">当前项目：{{ currentProject.name }}</a-tag>
+        </div>
         <p class="page-subtitle">
           完整项目导出适合发给别人，JSON 备份可在当前电脑重新导入，CSV 更适合作为查看和流转记录。
         </p>
@@ -22,20 +25,6 @@
     </header>
 
     <main class="page-section">
-      <section class="page-card project-context-card">
-        <div class="section-header">
-          <h2>当前项目</h2>
-        </div>
-        <div class="project-context-grid">
-          <div class="meta-card">
-            <span>项目名称</span>
-            <strong class="meta-file-name" :title="currentProject?.name ?? '-'">
-              {{ currentProject?.name ?? '未选择项目' }}
-            </strong>
-          </div>
-        </div>
-      </section>
-
       <section class="page-card">
         <div class="section-header">
           <h2>结果概览</h2>

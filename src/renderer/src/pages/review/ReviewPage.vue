@@ -80,8 +80,7 @@
           />
         </div>
         <div v-else class="preview-empty">
-          <strong>当前没有可预览的图片</strong>
-          <span>请从左侧图片列表选择，或返回首页重新导入项目。</span>
+          <strong>暂无图片</strong>
         </div>
         <div class="meta-grid">
           <div class="meta-card">
@@ -111,7 +110,6 @@
           <div class="field-block">
             <div class="compare-inline-header">
               <label class="field-label">对比列表</label>
-              <span class="section-tip">当前项目已加入 {{ compareItems.length }} 张</span>
             </div>
             <div v-if="compareItems.length" class="compare-chip-list">
               <button
@@ -130,7 +128,7 @@
                 </span>
               </button>
             </div>
-            <div v-else class="compare-empty">看到需要横向比较的图片时，点“加入对比”即可。</div>
+            <div v-else class="compare-empty">暂无对比图片</div>
           </div>
 
           <div class="field-block">
@@ -199,8 +197,7 @@
     <div class="compare-modal-body">
       <div class="compare-selector-bar">
         <div>
-          <strong>从对比列表里选两张图</strong>
-          <p>当前项目已加入 {{ compareItems.length }} 张，对比时最多同时选中两张。</p>
+          <strong>选择两张图</strong>
         </div>
         <a-button danger ghost @click="clearCompareList">清空对比列表</a-button>
       </div>
@@ -249,8 +246,7 @@
         </article>
       </div>
       <div v-else class="compare-preview-empty">
-        <strong>请选择两张图开始对比</strong>
-        <span>你可以先在审核过程中把图片加入对比列表，再在这里切换查看。</span>
+        <strong>请选择两张图</strong>
       </div>
     </div>
   </a-modal>
