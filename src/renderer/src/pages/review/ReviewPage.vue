@@ -4,8 +4,9 @@
       <div>
         <h1 class="page-title">{{ projectStore.currentProject?.name ?? '审核页' }}</h1>
         <p class="page-subtitle">
-          当前 {{ currentIndex }} / {{ projectAssets.length }} · 已处理 {{ projectStore.currentSummary.reviewedCount }}
-          / {{ projectStore.currentSummary.totalCount }}
+          当前 {{ currentIndex }} / {{ projectAssets.length }} · 已处理
+          {{ projectStore.currentSummary.reviewedCount }} /
+          {{ projectStore.currentSummary.totalCount }}
         </p>
       </div>
       <a-space>
@@ -47,14 +48,31 @@
       <section class="page-card review-card review-card-preview">
         <div class="section-header">
           <h2>当前图片</h2>
-          <span class="section-tip">中间只负责看图</span>
+          <a-space wrap>
+            <a-button
+              size="middle"
+              :disabled="!canAddCurrentToCompare"
+              @click="addCurrentToCompare"
+            >
+              {{ isCurrentInCompare ? '已加入对比' : '加入对比' }}
+            </a-button>
+            <a-button size="middle" :disabled="compareItems.length < 2" @click="openCompareModal">
+              打开对比（{{ compareItems.length }}）
+            </a-button>
+          </a-space>
         </div>
-        <img
-          v-if="currentItem?.asset.filePath"
-          class="preview-box"
-          :src="getOriginalSrc(currentItem?.asset.filePath)"
-          alt=""
-        />
+        <div v-if="currentItem?.asset.filePath" class="preview-stage">
+          <a-image
+            class="preview-box"
+            :src="getOriginalSrc(currentItem?.asset.filePath)"
+            alt=""
+            :preview="{
+              visible: detailPreviewVisible,
+              onVisibleChange: handleDetailPreviewVisibleChange
+            }"
+            @click="openDetailPreview"
+          />
+        </div>
         <div v-else class="preview-empty">
           <strong>当前没有可预览的图片</strong>
           <span>请从左侧图片列表选择，或返回首页重新导入项目。</span>
@@ -84,6 +102,31 @@
         </div>
 
         <div class="review-panel-body">
+          <div class="field-block">
+            <div class="compare-inline-header">
+              <label class="field-label">对比列表</label>
+              <span class="section-tip">当前项目已加入 {{ compareItems.length }} 张</span>
+            </div>
+            <div v-if="compareItems.length" class="compare-chip-list">
+              <button
+                v-for="item in compareItems"
+                :key="item.asset.id"
+                type="button"
+                class="compare-chip"
+                :class="{ active: item.asset.id === assetStore.currentAssetId }"
+                @click="assetStore.selectAsset(item.asset.id)"
+              >
+                <span class="compare-chip-text" :title="item.asset.fileName">{{
+                  item.asset.fileName
+                }}</span>
+                <span class="compare-chip-remove" @click.stop="removeFromCompare(item.asset.id)">
+                  ×
+                </span>
+              </button>
+            </div>
+            <div v-else class="compare-empty">看到需要横向比较的图片时，点“加入对比”即可。</div>
+          </div>
+
           <div class="field-block">
             <label class="field-label">处理结论</label>
             <a-space wrap>
@@ -124,19 +167,93 @@
         </div>
 
         <div class="review-actions">
-          <a-button size="large" :disabled="isPreviousDisabled" @click="selectPrevious">上一张</a-button>
-          <a-button type="primary" size="large" :disabled="isNextDisabled" @click="handlePrimaryAction">
+          <a-button size="large" :disabled="isPreviousDisabled" @click="selectPrevious"
+            >上一张</a-button
+          >
+          <a-button
+            type="primary"
+            size="large"
+            :disabled="isNextDisabled"
+            @click="handlePrimaryAction"
+          >
             {{ primaryActionText }}
           </a-button>
         </div>
       </section>
     </main>
   </div>
+
+  <a-modal
+    v-model:open="compareModalOpen"
+    title="图片对比"
+    width="94vw"
+    wrap-class-name="compare-modal"
+    :footer="null"
+  >
+    <div class="compare-modal-body">
+      <div class="compare-selector-bar">
+        <div>
+          <strong>从对比列表里选两张图</strong>
+          <p>当前项目已加入 {{ compareItems.length }} 张，对比时最多同时选中两张。</p>
+        </div>
+        <a-button danger ghost @click="clearCompareList">清空对比列表</a-button>
+      </div>
+
+      <div class="compare-selector-list">
+        <button
+          v-for="item in compareItems"
+          :key="item.asset.id"
+          type="button"
+          class="compare-selector-card"
+          :class="{ active: selectedCompareAssetIds.includes(item.asset.id) }"
+          @click="toggleCompareSelection(item.asset.id)"
+        >
+          <img
+            class="compare-selector-cover"
+            :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)"
+            alt=""
+            loading="lazy"
+          />
+          <span class="compare-selector-name" :title="item.asset.fileName">{{
+            item.asset.fileName
+          }}</span>
+          <span class="compare-selector-meta">
+            {{ item.decisionText }} · {{ item.categoryText }}
+          </span>
+        </button>
+      </div>
+
+      <div v-if="selectedCompareItems.length === 2" class="compare-preview-grid">
+        <article
+          v-for="item in selectedCompareItems"
+          :key="item.asset.id"
+          class="compare-preview-card"
+        >
+          <div class="compare-preview-head">
+            <strong :title="item.asset.fileName">{{ item.asset.fileName }}</strong>
+            <span>{{ item.resolutionText }} · {{ formatFileSize(item.asset.fileSize) }}</span>
+          </div>
+          <div class="compare-preview-stage">
+            <a-image
+              class="compare-preview-image"
+              :src="getOriginalSrc(item.asset.filePath)"
+              alt=""
+            />
+          </div>
+        </article>
+      </div>
+      <div v-else class="compare-preview-empty">
+        <strong>请选择两张图开始对比</strong>
+        <span>你可以先在审核过程中把图片加入对比列表，再在这里切换查看。</span>
+      </div>
+    </div>
+  </a-modal>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 import {
   ASSET_CATEGORY_OPTIONS,
@@ -145,6 +262,7 @@ import {
   REVIEW_DECISION_TEXT
 } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
+import { useCompareStore } from '@renderer/app/store/compare.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
 import { toFileUrl } from '@renderer/app/utils/file'
@@ -154,9 +272,13 @@ const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
 const assetStore = useAssetStore()
+const compareStore = useCompareStore()
 const reviewStore = useReviewStore()
 const thumbListRef = ref<HTMLElement | null>(null)
 const visibleThumbCount = ref(60)
+const detailPreviewVisible = ref(false)
+const compareModalOpen = ref(false)
+const selectedCompareAssetIds = ref<string[]>([])
 
 const projectAssets = computed(() =>
   assetStore.assets.filter((asset) => asset.projectId === projectStore.currentProjectId)
@@ -184,7 +306,32 @@ const currentItem = computed(
 )
 
 const currentReview = computed(() =>
-  assetStore.currentAssetId ? reviewStore.getReviewByAssetId(assetStore.currentAssetId) ?? null : null
+  assetStore.currentAssetId
+    ? (reviewStore.getReviewByAssetId(assetStore.currentAssetId) ?? null)
+    : null
+)
+
+const compareItems = computed(() => {
+  const compareAssetIds = compareStore.getProjectCompareAssetIds(projectStore.currentProjectId)
+  return compareAssetIds
+    .map((assetId) => reviewItems.value.find((item) => item.asset.id === assetId) ?? null)
+    .filter((item): item is AssetViewModel => Boolean(item))
+})
+
+const selectedCompareItems = computed(() =>
+  selectedCompareAssetIds.value
+    .map((assetId) => compareItems.value.find((item) => item.asset.id === assetId) ?? null)
+    .filter((item): item is AssetViewModel => Boolean(item))
+)
+
+const isCurrentInCompare = computed(() =>
+  assetStore.currentAssetId
+    ? compareStore.hasAsset(projectStore.currentProjectId, assetStore.currentAssetId)
+    : false
+)
+
+const canAddCurrentToCompare = computed(() =>
+  Boolean(currentItem.value && !isCurrentInCompare.value)
 )
 
 const currentIndex = computed(() => {
@@ -232,6 +379,9 @@ watch(
   () => projectStore.currentProjectId,
   () => {
     visibleThumbCount.value = 60
+    detailPreviewVisible.value = false
+    compareModalOpen.value = false
+    selectedCompareAssetIds.value = []
   }
 )
 
@@ -251,6 +401,28 @@ watchEffect(() => {
     assetStore.selectAsset(projectAssets.value[0].id)
   }
 })
+
+watch(
+  compareItems,
+  (items) => {
+    const nextSelected = selectedCompareAssetIds.value.filter((assetId) =>
+      items.some((item) => item.asset.id === assetId)
+    )
+
+    if (!nextSelected.length && items.length >= 2) {
+      selectedCompareAssetIds.value = items.slice(0, 2).map((item) => item.asset.id)
+      return
+    }
+
+    if (nextSelected.length > 2) {
+      selectedCompareAssetIds.value = nextSelected.slice(0, 2)
+      return
+    }
+
+    selectedCompareAssetIds.value = nextSelected
+  },
+  { immediate: true }
+)
 
 function updateDecision(value: ReviewDecision): void {
   if (!assetStore.currentAssetId) return
@@ -283,6 +455,55 @@ function handlePrimaryAction(): void {
   if (!isLastAsset.value) {
     selectNext()
   }
+}
+
+function openDetailPreview(): void {
+  if (!currentItem.value) return
+  detailPreviewVisible.value = true
+}
+
+function handleDetailPreviewVisibleChange(visible: boolean): void {
+  detailPreviewVisible.value = visible
+}
+
+function addCurrentToCompare(): void {
+  if (!assetStore.currentAssetId) return
+  compareStore.addAsset(projectStore.currentProjectId, assetStore.currentAssetId)
+  if (compareItems.value.length >= 2 && selectedCompareAssetIds.value.length < 2) {
+    selectedCompareAssetIds.value = compareItems.value.slice(0, 2).map((item) => item.asset.id)
+  }
+  message.success('已加入对比列表')
+}
+
+function removeFromCompare(assetId: string): void {
+  compareStore.removeAsset(projectStore.currentProjectId, assetId)
+}
+
+function openCompareModal(): void {
+  if (compareItems.value.length < 2) return
+  if (selectedCompareAssetIds.value.length < 2) {
+    selectedCompareAssetIds.value = compareItems.value.slice(0, 2).map((item) => item.asset.id)
+  }
+  compareModalOpen.value = true
+}
+
+function toggleCompareSelection(assetId: string): void {
+  if (selectedCompareAssetIds.value.includes(assetId)) {
+    selectedCompareAssetIds.value = selectedCompareAssetIds.value.filter((id) => id !== assetId)
+    return
+  }
+
+  if (selectedCompareAssetIds.value.length >= 2) {
+    selectedCompareAssetIds.value = [selectedCompareAssetIds.value[1], assetId]
+    return
+  }
+
+  selectedCompareAssetIds.value = [...selectedCompareAssetIds.value, assetId]
+}
+
+function clearCompareList(): void {
+  compareStore.clearProject(projectStore.currentProjectId)
+  selectedCompareAssetIds.value = []
 }
 
 function goHome(): void {
