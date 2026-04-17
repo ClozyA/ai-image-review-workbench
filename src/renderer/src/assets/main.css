@@ -143,6 +143,13 @@ body {
   color: #2f6bff;
 }
 
+.project-tile-favorites {
+  place-items: center;
+  min-height: 220px;
+  border-style: dashed;
+  color: #d28b00;
+}
+
 .project-tile-mark {
   width: 64px;
   height: 64px;
@@ -151,6 +158,10 @@ body {
   place-items: center;
   font-size: 34px;
   background: rgba(47, 107, 255, 0.12);
+}
+
+.project-tile-mark-favorite {
+  background: rgba(210, 139, 0, 0.12);
 }
 
 .project-cover,
@@ -201,6 +212,25 @@ body {
 
 .filter-card {
   min-height: 0;
+}
+
+.favorites-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.favorites-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  align-content: start;
+  grid-auto-rows: max-content;
+}
+
+.favorites-item .result-item-main {
+  align-content: start;
 }
 
 .filter-card-sidebar,

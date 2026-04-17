@@ -39,6 +39,7 @@ export interface AssetReview {
   projectId: ProjectId
   decision: ReviewDecision
   category?: AssetCategory
+  favorite: boolean
   comment: string
   reviewedAt?: string
   updatedAt: string

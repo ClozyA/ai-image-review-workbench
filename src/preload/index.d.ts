@@ -30,6 +30,7 @@ interface ReviewProjectSnapshot {
     projectId: string
     decision: 'approved' | 'pending' | 'rejected' | 'unreviewed'
     category?: 'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'
+    favorite: boolean
     comment: string
     reviewedAt?: string
     updatedAt: string

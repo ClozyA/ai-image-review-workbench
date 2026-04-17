@@ -26,6 +26,12 @@
               <span>从图片文件夹创建项目</span>
             </article>
 
+            <article class="project-tile project-tile-favorites" @click="goFavorites">
+              <div class="project-tile-mark project-tile-mark-favorite">★</div>
+              <strong>收藏夹</strong>
+              <span>{{ favoriteCount }} 张已收藏图片</span>
+            </article>
+
             <article
               v-for="project in projectStore.projects"
               :key="project.id"
@@ -70,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 
@@ -92,9 +98,15 @@ const renameModalOpen = ref(false)
 const renameInput = ref('')
 const renamingProjectId = ref<string | null>(null)
 
+const favoriteCount = computed(() => reviewStore.reviews.filter((review) => review.favorite).length)
+
 function goReview(projectId: string): void {
   projectStore.selectProject(projectId)
   router.push({ name: 'review', params: { projectId } })
+}
+
+function goFavorites(): void {
+  router.push({ name: 'favorites' })
 }
 
 function formatDate(value?: string): string {

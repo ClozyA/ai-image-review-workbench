@@ -61,15 +61,37 @@ export const useReviewStore = defineStore('review', () => {
     void persistProject(target.projectId)
   }
 
+  function toggleFavorite(assetId: AssetId): void {
+    const target = getReviewByAssetId(assetId)
+    if (!target) return
+    saveStatus.value = 'saving'
+    target.favorite = !target.favorite
+    target.updatedAt = new Date().toISOString()
+    saveStatus.value = 'saved'
+    refreshProjectSummary(target.projectId)
+    void persistProject(target.projectId)
+  }
+
   function replaceBySnapshot(snapshot: ReviewProjectSnapshot): void {
     const otherReviews = reviews.value.filter((review) => review.projectId !== snapshot.project.id)
-    reviews.value = [...otherReviews, ...snapshot.reviews]
+    reviews.value = [
+      ...otherReviews,
+      ...snapshot.reviews.map((review) => ({
+        ...review,
+        favorite: Boolean(review.favorite)
+      }))
+    ]
     saveStatus.value = 'saved'
     projectStore.refreshSummary(snapshot.project.id, snapshot.assets, snapshot.reviews)
   }
 
   function replaceBySnapshots(snapshots: ReviewProjectSnapshot[]): void {
-    reviews.value = snapshots.flatMap((snapshot) => snapshot.reviews)
+    reviews.value = snapshots.flatMap((snapshot) =>
+      snapshot.reviews.map((review) => ({
+        ...review,
+        favorite: Boolean(review.favorite)
+      }))
+    )
     saveStatus.value = 'saved'
   }
 
@@ -114,6 +136,7 @@ export const useReviewStore = defineStore('review', () => {
     updateDecision,
     updateCategory,
     updateComment,
+    toggleFavorite,
     replaceBySnapshot,
     replaceBySnapshots,
     removeProjectReviews,

@@ -39,7 +39,9 @@
             />
             <span class="thumb-meta">
               <strong>{{ item.asset.fileName }}</strong>
-              <small>{{ item.decisionText }} · {{ item.categoryText }}</small>
+              <small>
+                {{ item.decisionText }} · {{ item.categoryText }}{{ item.review.favorite ? ' · 已收藏' : '' }}
+              </small>
             </span>
           </button>
         </div>
@@ -49,6 +51,9 @@
         <div class="section-header">
           <h2>当前图片</h2>
           <a-space wrap>
+            <a-button size="middle" :disabled="!currentReview" @click="toggleCurrentFavorite">
+              {{ currentReview?.favorite ? '取消收藏' : '加入收藏' }}
+            </a-button>
             <a-button
               size="middle"
               :disabled="!canAddCurrentToCompare"
@@ -437,6 +442,13 @@ function updateCategory(value: AssetCategory): void {
 function onCommentChange(value: string): void {
   if (!assetStore.currentAssetId) return
   reviewStore.updateComment(assetStore.currentAssetId, value)
+}
+
+function toggleCurrentFavorite(): void {
+  if (!assetStore.currentAssetId) return
+  const nextFavorite = !currentReview.value?.favorite
+  reviewStore.toggleFavorite(assetStore.currentAssetId)
+  message.success(nextFavorite ? '已加入收藏' : '已取消收藏')
 }
 
 function selectNext(): void {

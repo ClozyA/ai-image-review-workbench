@@ -13,6 +13,7 @@ export interface ExportItem {
   decisionText: string
   category?: string
   categoryText?: string
+  favorite: boolean
   resolution: string
   fileSize: number
   comment: string
@@ -150,6 +151,7 @@ function buildCsvContent(payload: ExportPayload): string {
     '处理结论文本',
     '分类',
     '分类文本',
+    '是否收藏',
     '分辨率',
     '文件大小',
     '备注',
@@ -168,6 +170,7 @@ function buildCsvContent(payload: ExportPayload): string {
     item.decisionText,
     item.category ?? '',
     item.categoryText ?? '',
+    item.favorite ? '是' : '否',
     item.resolution,
     String(item.fileSize),
     item.comment,

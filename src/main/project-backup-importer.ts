@@ -63,6 +63,7 @@ export async function importLocalBackupJson(
       projectId: payload.projectId,
       decision: normalizeDecision(item.decision),
       category: normalizeCategory(item.category),
+      favorite: Boolean(item.favorite),
       comment: item.comment ?? '',
       reviewedAt: item.reviewedAt,
       updatedAt: item.updatedAt || payload.exportedAt

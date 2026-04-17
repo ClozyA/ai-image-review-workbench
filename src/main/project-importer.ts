@@ -71,7 +71,10 @@ export async function importFullProjectBundle(
       lastOpenedAt: new Date().toISOString()
     },
     assets,
-    reviews: manifest.reviews.map((review) => ({ ...review }))
+    reviews: manifest.reviews.map((review) => ({
+      ...review,
+      favorite: Boolean(review.favorite)
+    }))
   }
 
   return hydrateSnapshotThumbnails(snapshot, thumbnailBaseDir)

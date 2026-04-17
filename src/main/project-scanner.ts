@@ -37,6 +37,7 @@ export interface ReviewProjectSnapshot {
     projectId: ProjectId
     decision: ReviewDecision
     category?: AssetCategory
+    favorite: boolean
     comment: string
     reviewedAt?: string
     updatedAt: string
@@ -96,6 +97,7 @@ export async function createProjectSnapshotFromFolder(
     assetId: asset.id,
     projectId,
     decision: 'unreviewed',
+    favorite: false,
     comment: '',
     updatedAt: now
   }))

@@ -8,6 +8,7 @@ export interface ExportItem {
   decisionText: string
   category?: string
   categoryText?: string
+  favorite: boolean
   resolution: string
   fileSize: number
   comment: string

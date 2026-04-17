@@ -78,12 +78,13 @@ export const mockAssets: ImageAsset[] = [
 ]
 
 export const mockReviews: AssetReview[] = [
-  { assetId: 'asset-001', projectId: 'project-001', decision: 'unreviewed', comment: '', updatedAt: '2026-04-16T12:00:00.000Z' },
+  { assetId: 'asset-001', projectId: 'project-001', decision: 'unreviewed', favorite: false, comment: '', updatedAt: '2026-04-16T12:00:00.000Z' },
   {
     assetId: 'asset-002',
     projectId: 'project-001',
     decision: 'approved',
     category: 'ai-generated',
+    favorite: true,
     comment: '主体完整，适合继续进入结果页确认。',
     reviewedAt: '2026-04-16T10:20:00.000Z',
     updatedAt: '2026-04-16T10:20:00.000Z'
@@ -93,6 +94,7 @@ export const mockReviews: AssetReview[] = [
     projectId: 'project-001',
     decision: 'pending',
     category: 'design-screenshot',
+    favorite: false,
     comment: '需要再确认文字区域和边缘细节。',
     reviewedAt: '2026-04-16T10:45:00.000Z',
     updatedAt: '2026-04-16T10:45:00.000Z'
@@ -102,6 +104,7 @@ export const mockReviews: AssetReview[] = [
     projectId: 'project-001',
     decision: 'rejected',
     category: 'campaign-material',
+    favorite: false,
     comment: '',
     reviewedAt: '2026-04-16T11:10:00.000Z',
     updatedAt: '2026-04-16T11:10:00.000Z'
@@ -111,6 +114,7 @@ export const mockReviews: AssetReview[] = [
     projectId: 'project-001',
     decision: 'approved',
     category: 'reference',
+    favorite: true,
     comment: '可作为风格参考保留。',
     reviewedAt: '2026-04-16T11:32:00.000Z',
     updatedAt: '2026-04-16T11:32:00.000Z'
@@ -120,6 +124,7 @@ export const mockReviews: AssetReview[] = [
     projectId: 'project-001',
     decision: 'pending',
     category: 'campaign-material',
+    favorite: false,
     comment: '',
     reviewedAt: '2026-04-16T11:54:00.000Z',
     updatedAt: '2026-04-16T11:54:00.000Z'
