@@ -15,6 +15,7 @@ interface ImportedProjectManifest {
   project: ReviewProjectSnapshot['project']
   assets: ImportedManifestAsset[]
   reviews: ReviewProjectSnapshot['reviews']
+  uiState?: ReviewProjectSnapshot['uiState']
 }
 
 export async function importFullProjectBundle(
@@ -74,7 +75,8 @@ export async function importFullProjectBundle(
     reviews: manifest.reviews.map((review) => ({
       ...review,
       favorite: Boolean(review.favorite)
-    }))
+    })),
+    uiState: manifest.uiState
   }
 
   return hydrateSnapshotThumbnails(snapshot, thumbnailBaseDir)

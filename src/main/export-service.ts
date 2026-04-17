@@ -28,6 +28,18 @@ export interface ExportPayload {
   exportedAt: string
   summary?: Record<string, number>
   filterDescription?: string
+  uiState?: {
+    lastRoute?: 'review' | 'filter' | 'result'
+    lastSelectedAssetId?: string
+    reviewThumbScrollTop?: number
+    filterResultScrollTop?: number
+    filter?: {
+      decisions: string[]
+      categories: string[]
+      hasComment?: boolean
+      keyword: string
+    }
+  }
   items: ExportItem[]
 }
 
@@ -113,7 +125,8 @@ export async function exportFullProjectBundle(
     mode: 'full-project',
     project: snapshot.project,
     assets: exportedAssets,
-    reviews: snapshot.reviews
+    reviews: snapshot.reviews,
+    uiState: snapshot.uiState
   }
 
   await writeFile(

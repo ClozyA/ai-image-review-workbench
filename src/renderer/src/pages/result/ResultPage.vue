@@ -118,6 +118,7 @@ import {
   buildProjectSnapshotForExport
 } from '@renderer/app/utils/export'
 import { toFileUrl } from '@renderer/app/utils/file'
+import { persistProjectById } from '@renderer/app/utils/project-persist'
 import type { ExportFormat } from '@renderer/app/types/export'
 import type { AssetCategory } from '@renderer/app/types/review'
 
@@ -148,9 +149,17 @@ watchEffect(() => {
   if (routeProjectId && routeProjectId !== projectStore.currentProjectId) {
     projectStore.selectProject(routeProjectId)
   }
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'result' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
 })
 
 function goFilter(): void {
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'filter' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
   router.push({ name: 'filter', params: { projectId: projectStore.currentProjectId } })
 }
 
@@ -159,6 +168,10 @@ function goHome(): void {
 }
 
 function goReview(): void {
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'review' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
   router.push({ name: 'review', params: { projectId: projectStore.currentProjectId } })
 }
 
@@ -174,7 +187,8 @@ async function exportProjectResults(format: ExportFormat): Promise<void> {
   const snapshot = buildProjectSnapshotForExport(
     currentProject.value,
     assetStore.assets,
-    reviewStore.reviews
+    reviewStore.reviews,
+    projectStore.getProjectUiState(projectStore.currentProjectId)
   )
   if (!snapshot) {
     message.warning('当前没有可导出的项目')
@@ -212,7 +226,8 @@ async function exportCompleteProject(): Promise<void> {
   const snapshot = buildProjectSnapshotForExport(
     currentProject.value,
     assetStore.assets,
-    reviewStore.reviews
+    reviewStore.reviews,
+    projectStore.getProjectUiState(projectStore.currentProjectId)
   )
   if (!snapshot) {
     message.warning('当前没有可导出的项目')

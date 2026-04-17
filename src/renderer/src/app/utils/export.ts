@@ -3,6 +3,7 @@ import type { ExportItem, ExportPayload } from '@renderer/app/types/export'
 import type {
   AssetReview,
   ImageAsset,
+  ProjectUiState,
   ReviewProject,
   ReviewProjectSnapshot
 } from '@renderer/app/types/review'
@@ -10,7 +11,8 @@ import type {
 export function buildProjectSnapshotForExport(
   project: ReviewProject | null,
   assets: ImageAsset[],
-  reviews: AssetReview[]
+  reviews: AssetReview[],
+  uiState?: ProjectUiState
 ): ReviewProjectSnapshot | null {
   if (!project) return null
 
@@ -19,7 +21,8 @@ export function buildProjectSnapshotForExport(
     assets: assets.filter((asset) => asset.projectId === project.id).map((asset) => ({ ...asset })),
     reviews: reviews
       .filter((review) => review.projectId === project.id)
-      .map((review) => ({ ...review }))
+      .map((review) => ({ ...review })),
+    uiState: uiState ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined } : undefined
   }
 }
 
@@ -53,6 +56,7 @@ export function buildProjectExportPayload(
     exportedAt: new Date().toISOString(),
     filterDescription: options?.filterDescription,
     summary: options?.summary,
+    uiState: snapshot.uiState,
     items
   }
 }

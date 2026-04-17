@@ -72,8 +72,17 @@ export interface ReviewFilter {
   keyword: string
 }
 
+export interface ProjectUiState {
+  lastRoute?: 'review' | 'filter' | 'result'
+  lastSelectedAssetId?: AssetId
+  reviewThumbScrollTop?: number
+  filterResultScrollTop?: number
+  filter?: ReviewFilter
+}
+
 export interface ReviewProjectSnapshot {
   project: ReviewProject
   assets: ImageAsset[]
   reviews: AssetReview[]
+  uiState?: ProjectUiState
 }

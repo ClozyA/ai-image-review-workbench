@@ -271,6 +271,7 @@ import { useCompareStore } from '@renderer/app/store/compare.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
 import { toFileUrl } from '@renderer/app/utils/file'
+import { persistProjectById } from '@renderer/app/utils/project-persist'
 import type { AssetCategory, AssetViewModel, ReviewDecision } from '@renderer/app/types/review'
 
 const route = useRoute()
@@ -284,6 +285,7 @@ const visibleThumbCount = ref(60)
 const detailPreviewVisible = ref(false)
 const compareModalOpen = ref(false)
 const selectedCompareAssetIds = ref<string[]>([])
+let reviewScrollSaveTimer: ReturnType<typeof setTimeout> | undefined
 
 const projectAssets = computed(() =>
   assetStore.assets.filter((asset) => asset.projectId === projectStore.currentProjectId)
@@ -365,6 +367,13 @@ watch(
   () => assetStore.currentAssetId,
   async (assetId) => {
     if (!assetId) return
+    if (projectStore.currentProjectId) {
+      projectStore.updateUiState(projectStore.currentProjectId, {
+        lastRoute: 'review',
+        lastSelectedAssetId: assetId
+      })
+      void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+    }
     await nextTick()
     const list = thumbListRef.value
     if (!list) return
@@ -382,11 +391,16 @@ watchEffect(() => {
 
 watch(
   () => projectStore.currentProjectId,
-  () => {
+  async () => {
     visibleThumbCount.value = 60
     detailPreviewVisible.value = false
     compareModalOpen.value = false
     selectedCompareAssetIds.value = []
+    await nextTick()
+    const scrollTop = projectStore.currentUiState.reviewThumbScrollTop ?? 0
+    if (thumbListRef.value) {
+      thumbListRef.value.scrollTop = scrollTop
+    }
   }
 )
 
@@ -523,10 +537,18 @@ function goHome(): void {
 }
 
 function goFilter(): void {
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'filter' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
   router.push({ name: 'filter', params: { projectId: projectStore.currentProjectId } })
 }
 
 function goResult(): void {
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'result' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
   router.push({ name: 'result', params: { projectId: projectStore.currentProjectId } })
 }
 
@@ -538,6 +560,19 @@ function formatFileSize(value?: number): string {
 function handleThumbListScroll(event: Event): void {
   const target = event.target as HTMLElement | null
   if (!target) return
+
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, {
+      lastRoute: 'review',
+      reviewThumbScrollTop: target.scrollTop
+    })
+    if (reviewScrollSaveTimer) {
+      clearTimeout(reviewScrollSaveTimer)
+    }
+    reviewScrollSaveTimer = setTimeout(() => {
+      void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+    }, 180)
+  }
 
   const remaining = target.scrollHeight - target.scrollTop - target.clientHeight
   if (remaining > 240) return

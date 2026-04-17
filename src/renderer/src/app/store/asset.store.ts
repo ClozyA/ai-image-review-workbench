@@ -32,12 +32,13 @@ export const useAssetStore = defineStore('asset', () => {
   function replaceBySnapshot(snapshot: ReviewProjectSnapshot): void {
     const otherAssets = assets.value.filter((asset) => asset.projectId !== snapshot.project.id)
     assets.value = [...otherAssets, ...snapshot.assets]
-    currentAssetId.value = snapshot.assets[0]?.id ?? ''
+    currentAssetId.value = snapshot.uiState?.lastSelectedAssetId ?? snapshot.assets[0]?.id ?? ''
   }
 
   function replaceBySnapshots(snapshots: ReviewProjectSnapshot[]): void {
     assets.value = snapshots.flatMap((snapshot) => snapshot.assets)
-    currentAssetId.value = snapshots[0]?.assets[0]?.id ?? ''
+    currentAssetId.value =
+      snapshots[0]?.uiState?.lastSelectedAssetId ?? snapshots[0]?.assets[0]?.id ?? ''
   }
 
   function removeProjectAssets(projectId: string): void {

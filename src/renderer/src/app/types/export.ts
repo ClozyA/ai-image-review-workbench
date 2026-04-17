@@ -23,6 +23,18 @@ export interface ExportPayload {
   exportedAt: string
   summary?: Record<string, number>
   filterDescription?: string
+  uiState?: {
+    lastRoute?: 'review' | 'filter' | 'result'
+    lastSelectedAssetId?: string
+    reviewThumbScrollTop?: number
+    filterResultScrollTop?: number
+    filter?: {
+      decisions: string[]
+      categories: string[]
+      hasComment?: boolean
+      keyword: string
+    }
+  }
   items: ExportItem[]
 }
 

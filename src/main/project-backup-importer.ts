@@ -82,7 +82,8 @@ export async function importLocalBackupJson(
       version: 1
     },
     assets: resolvedAssets,
-    reviews
+    reviews,
+    uiState: normalizeUiState(payload.uiState)
   }
 
   return hydrateSnapshotThumbnails(snapshot, thumbnailBaseDir)
@@ -133,4 +134,29 @@ function normalizeCategory(
     return value
   }
   return undefined
+}
+
+function normalizeUiState(
+  value?: ExportPayload['uiState']
+): ReviewProjectSnapshot['uiState'] | undefined {
+  if (!value) return undefined
+
+  return {
+    lastRoute: value.lastRoute,
+    lastSelectedAssetId: value.lastSelectedAssetId,
+    reviewThumbScrollTop: value.reviewThumbScrollTop,
+    filterResultScrollTop: value.filterResultScrollTop,
+    filter: value.filter
+      ? {
+          decisions: value.filter.decisions
+            .map((item) => normalizeDecision(item))
+            .filter((item, index, arr) => arr.indexOf(item) === index),
+          categories: value.filter.categories
+            .map((item) => normalizeCategory(item))
+            .filter((item): item is NonNullable<ReviewProjectSnapshot['reviews'][number]['category']> => Boolean(item)),
+          hasComment: value.filter.hasComment,
+          keyword: value.filter.keyword
+        }
+      : undefined
+  }
 }

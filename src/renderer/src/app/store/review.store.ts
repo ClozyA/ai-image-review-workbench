@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import { mockReviews } from '@renderer/app/mocks/review.mock'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
+import { buildProjectSnapshot } from '@renderer/app/utils/project-snapshot'
 import type {
   AssetCategory,
   AssetId,
@@ -118,14 +119,14 @@ export const useReviewStore = defineStore('review', () => {
     project.updatedAt = now
     project.lastOpenedAt = now
     project.assetCount = assets.length
-
-    await window.api.saveProjectSnapshot({
-      project: {
-        ...project
-      },
+    const snapshot = buildProjectSnapshot(
+      project,
       assets,
-      reviews: projectReviews
-    })
+      projectReviews,
+      projectStore.getProjectUiState(projectId)
+    )
+    if (!snapshot) return
+    await window.api.saveProjectSnapshot(snapshot)
   }
 
   return {

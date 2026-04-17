@@ -9,6 +9,7 @@ import type {
   ImageAsset,
   ProjectId,
   ProjectSummary,
+  ProjectUiState,
   ReviewProject,
   ReviewProjectSnapshot
 } from '@renderer/app/types/review'
@@ -36,6 +37,7 @@ function buildSummary(projectAssets: ImageAsset[], projectReviews: AssetReview[]
 export const useProjectStore = defineStore('project', () => {
   const projects = ref<ReviewProject[]>(mockProjects)
   const currentProjectId = ref<ProjectId>(mockProjects[0]?.id ?? '')
+  const uiStates = ref<Record<ProjectId, ProjectUiState>>({})
 
   const summaries = ref<Record<ProjectId, ProjectSummary>>(
     Object.fromEntries(
@@ -57,12 +59,28 @@ export const useProjectStore = defineStore('project', () => {
     () => summaries.value[currentProjectId.value] ?? { ...EMPTY_PROJECT_SUMMARY }
   )
 
+  const currentUiState = computed(() => uiStates.value[currentProjectId.value] ?? {})
+
   function selectProject(projectId: ProjectId): void {
     currentProjectId.value = projectId
   }
 
   function refreshSummary(projectId: ProjectId, assets: ImageAsset[], reviews: AssetReview[]): void {
     summaries.value[projectId] = buildSummary(assets, reviews)
+  }
+
+  function getProjectUiState(projectId: ProjectId): ProjectUiState {
+    return uiStates.value[projectId] ?? {}
+  }
+
+  function updateUiState(projectId: ProjectId, patch: Partial<ProjectUiState>): void {
+    uiStates.value = {
+      ...uiStates.value,
+      [projectId]: {
+        ...getProjectUiState(projectId),
+        ...patch
+      }
+    }
   }
 
   function upsertProject(snapshot: ReviewProjectSnapshot): void {
@@ -73,6 +91,7 @@ export const useProjectStore = defineStore('project', () => {
       projects.value = [snapshot.project, ...projects.value]
     }
     currentProjectId.value = snapshot.project.id
+    updateUiState(snapshot.project.id, snapshot.uiState ?? {})
     refreshSummary(snapshot.project.id, snapshot.assets, snapshot.reviews)
   }
 
@@ -84,6 +103,9 @@ export const useProjectStore = defineStore('project', () => {
         buildSummary(snapshot.assets, snapshot.reviews)
       ])
     )
+    uiStates.value = Object.fromEntries(
+      snapshots.map((snapshot) => [snapshot.project.id, snapshot.uiState ?? {}])
+    )
     currentProjectId.value = snapshots[0]?.project.id ?? ''
   }
 
@@ -92,6 +114,9 @@ export const useProjectStore = defineStore('project', () => {
     const nextSummaries = { ...summaries.value }
     delete nextSummaries[projectId]
     summaries.value = nextSummaries
+    const nextUiStates = { ...uiStates.value }
+    delete nextUiStates[projectId]
+    uiStates.value = nextUiStates
 
     if (currentProjectId.value === projectId) {
       currentProjectId.value = projects.value[0]?.id ?? ''
@@ -102,10 +127,14 @@ export const useProjectStore = defineStore('project', () => {
     projects,
     currentProjectId,
     summaries,
+    uiStates,
     currentProject,
     currentSummary,
+    currentUiState,
     selectProject,
     refreshSummary,
+    getProjectUiState,
+    updateUiState,
     upsertProject,
     replaceBySnapshots,
     removeProject

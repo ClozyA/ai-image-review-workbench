@@ -31,6 +31,15 @@ export const useFilterStore = defineStore('filter', () => {
     filter.value.keyword = keyword
   }
 
+  function replaceFilter(nextFilter: ReviewFilter): void {
+    filter.value = {
+      decisions: [...nextFilter.decisions],
+      categories: [...nextFilter.categories],
+      hasComment: nextFilter.hasComment,
+      keyword: nextFilter.keyword
+    }
+  }
+
   function reset(): void {
     filter.value = { ...DEFAULT_FILTER }
   }
@@ -41,6 +50,7 @@ export const useFilterStore = defineStore('filter', () => {
     toggleCategory,
     setHasComment,
     setKeyword,
+    replaceFilter,
     reset
   }
 })

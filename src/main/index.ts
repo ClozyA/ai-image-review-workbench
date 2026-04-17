@@ -90,17 +90,11 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('project:import-full-bundle', async () => {
-    const snapshot = await importFullProjectBundle(thumbnailBaseDir)
-    if (!snapshot) return null
-    await projectRepository.saveSnapshot(snapshot)
-    return snapshot
+    return importFullProjectBundle(thumbnailBaseDir)
   })
 
   ipcMain.handle('project:import-local-backup', async () => {
-    const snapshot = await importLocalBackupJson(thumbnailBaseDir)
-    if (!snapshot) return null
-    await projectRepository.saveSnapshot(snapshot)
-    return snapshot
+    return importLocalBackupJson(thumbnailBaseDir)
   })
 
   ipcMain.handle('project:save-snapshot', async (_, snapshot: ReviewProjectSnapshot) => {

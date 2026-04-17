@@ -112,7 +112,7 @@
           </a-space>
         </div>
 
-        <div v-if="filteredItems.length" class="result-list filter-result-list">
+        <div v-if="filteredItems.length" ref="filterResultListRef" class="result-list filter-result-list" @scroll="handleFilterResultScroll">
           <article v-for="item in filteredItems" :key="item.asset.id" class="result-item">
             <img
               class="result-item-cover"
@@ -140,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, nextTick, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 
@@ -160,6 +160,7 @@ import {
   buildProjectSnapshotForExport
 } from '@renderer/app/utils/export'
 import { toFileUrl } from '@renderer/app/utils/file'
+import { persistProjectById } from '@renderer/app/utils/project-persist'
 import type { ExportFormat } from '@renderer/app/types/export'
 import type { AssetViewModel } from '@renderer/app/types/review'
 
@@ -171,6 +172,8 @@ const reviewStore = useReviewStore()
 const filterStore = useFilterStore()
 const exportingJson = ref(false)
 const exportingCsv = ref(false)
+const filterResultListRef = ref<HTMLElement | null>(null)
+let filterScrollSaveTimer: ReturnType<typeof setTimeout> | undefined
 
 const filter = computed(() => filterStore.filter)
 const currentProject = computed(() => projectStore.currentProject)
@@ -216,7 +219,49 @@ watchEffect(() => {
   }
 })
 
+watch(
+  () => projectStore.currentProjectId,
+  async (projectId) => {
+    if (!projectId) return
+    projectStore.updateUiState(projectId, { lastRoute: 'filter' })
+    const savedFilter = projectStore.currentUiState.filter
+    if (savedFilter) {
+      filterStore.replaceFilter(savedFilter)
+    } else {
+      filterStore.reset()
+    }
+    await nextTick()
+    if (filterResultListRef.value) {
+      filterResultListRef.value.scrollTop = projectStore.currentUiState.filterResultScrollTop ?? 0
+    }
+    void persistProjectById(projectId, projectStore, assetStore, reviewStore)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => filter.value,
+  (nextFilter) => {
+    if (!projectStore.currentProjectId) return
+    projectStore.updateUiState(projectStore.currentProjectId, {
+      lastRoute: 'filter',
+      filter: {
+        decisions: [...nextFilter.decisions],
+        categories: [...nextFilter.categories],
+        hasComment: nextFilter.hasComment,
+        keyword: nextFilter.keyword
+      }
+    })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  },
+  { deep: true }
+)
+
 function goReview(): void {
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'review' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
   router.push({ name: 'review', params: { projectId: projectStore.currentProjectId } })
 }
 
@@ -225,6 +270,10 @@ function goHome(): void {
 }
 
 function goResult(): void {
+  if (projectStore.currentProjectId) {
+    projectStore.updateUiState(projectStore.currentProjectId, { lastRoute: 'result' })
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }
   router.push({ name: 'result', params: { projectId: projectStore.currentProjectId } })
 }
 
@@ -236,7 +285,8 @@ async function exportFilteredResults(format: ExportFormat): Promise<void> {
   const snapshot = buildProjectSnapshotForExport(
     currentProject.value,
     assetStore.assets,
-    reviewStore.reviews
+    reviewStore.reviews,
+    projectStore.getProjectUiState(projectStore.currentProjectId)
   )
   if (!snapshot) {
     message.warning('当前没有可导出的项目')
@@ -293,5 +343,23 @@ function buildFilterDescription(): string {
   }
 
   return parts.join('；') || '全部结果'
+}
+
+function handleFilterResultScroll(event: Event): void {
+  const target = event.target as HTMLElement | null
+  if (!target || !projectStore.currentProjectId) return
+
+  projectStore.updateUiState(projectStore.currentProjectId, {
+    lastRoute: 'filter',
+    filterResultScrollTop: target.scrollTop
+  })
+
+  if (filterScrollSaveTimer) {
+    clearTimeout(filterScrollSaveTimer)
+  }
+
+  filterScrollSaveTimer = setTimeout(() => {
+    void persistProjectById(projectStore.currentProjectId, projectStore, assetStore, reviewStore)
+  }, 180)
 }
 </script>

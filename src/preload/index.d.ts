@@ -35,6 +35,18 @@ interface ReviewProjectSnapshot {
     reviewedAt?: string
     updatedAt: string
   }>
+  uiState?: {
+    lastRoute?: 'review' | 'filter' | 'result'
+    lastSelectedAssetId?: string
+    reviewThumbScrollTop?: number
+    filterResultScrollTop?: number
+    filter?: {
+      decisions: Array<'approved' | 'pending' | 'rejected' | 'unreviewed'>
+      categories: Array<'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'>
+      hasComment?: boolean
+      keyword: string
+    }
+  }
 }
 
 interface RendererApi {

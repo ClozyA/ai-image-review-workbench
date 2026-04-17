@@ -7,6 +7,18 @@ type ProjectId = string
 type AssetId = string
 type ReviewDecision = 'approved' | 'pending' | 'rejected' | 'unreviewed'
 type AssetCategory = 'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'
+type ProjectUiState = {
+  lastRoute?: 'review' | 'filter' | 'result'
+  lastSelectedAssetId?: AssetId
+  reviewThumbScrollTop?: number
+  filterResultScrollTop?: number
+  filter?: {
+    decisions: ReviewDecision[]
+    categories: AssetCategory[]
+    hasComment?: boolean
+    keyword: string
+  }
+}
 
 export interface ReviewProjectSnapshot {
   project: {
@@ -42,6 +54,7 @@ export interface ReviewProjectSnapshot {
     reviewedAt?: string
     updatedAt: string
   }>
+  uiState?: ProjectUiState
 }
 
 const SUPPORTED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif'])
@@ -115,7 +128,11 @@ export async function createProjectSnapshotFromFolder(
       version: 1
     },
     assets,
-    reviews
+    reviews,
+    uiState: {
+      lastRoute: 'review',
+      lastSelectedAssetId: assets[0]?.id
+    }
   }
 }
 
