@@ -29,7 +29,7 @@
         </div>
       </section>
 
-      <section class="page-card">
+      <section class="page-card filter-card filter-card-sidebar">
         <div class="section-header">
           <h2>筛选条件</h2>
           <a-button size="small" @click="filterStore.reset">重置</a-button>
@@ -97,13 +97,13 @@
         </div>
       </section>
 
-      <section class="page-card">
+      <section class="page-card filter-card filter-card-results">
         <div class="section-header">
           <h2>筛选结果</h2>
           <span class="section-tip">共 {{ filteredItems.length }} 张</span>
         </div>
 
-        <div class="result-list">
+        <div v-if="filteredItems.length" class="result-list filter-result-list">
           <article v-for="item in filteredItems" :key="item.asset.id" class="result-item">
             <img
               class="result-item-cover"
@@ -120,6 +120,10 @@
               <small>{{ item.review.comment || '无备注' }}</small>
             </div>
           </article>
+        </div>
+        <div v-else class="filter-empty-state">
+          <strong>没有找到符合条件的图片</strong>
+          <span>可以试试放宽结论、分类或备注条件，或者直接点“重置”恢复全部结果。</span>
         </div>
       </section>
     </main>

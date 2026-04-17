@@ -181,6 +181,9 @@ body {
 
 .filter-page-grid {
   grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  height: calc(100vh - 140px);
+  min-height: 0;
 }
 
 .result-dashboard {
@@ -194,6 +197,53 @@ body {
 .project-context-card {
   display: grid;
   gap: 8px;
+}
+
+.filter-card {
+  min-height: 0;
+}
+
+.filter-card-sidebar,
+.filter-card-results {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-card-results {
+  overflow: hidden;
+}
+
+.filter-result-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  align-content: start;
+  grid-auto-rows: max-content;
+}
+
+.filter-empty-state {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  flex: 1;
+  min-height: 220px;
+  border: 1px dashed rgba(22, 39, 69, 0.12);
+  border-radius: 18px;
+  text-align: center;
+  color: #6f7d97;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.filter-empty-state strong {
+  font-size: 18px;
+  color: #1f2a44;
+}
+
+.filter-empty-state span {
+  max-width: 420px;
+  line-height: 1.7;
 }
 
 .project-context-tip {

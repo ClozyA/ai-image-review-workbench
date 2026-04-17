@@ -143,12 +143,27 @@ function getProjectCover(projectId: string, coverAssetId?: string): string {
 
 async function removeProject(projectId: string): Promise<void> {
   try {
+    await new Promise<void>((resolve, reject) => {
+      Modal.confirm({
+        title: '确认从书架移除项目？',
+        content: '这会移除本地书架记录，但不会删除原始图片文件夹。',
+        okText: '移除',
+        okButtonProps: { danger: true },
+        cancelText: '取消',
+        onOk: () => resolve(),
+        onCancel: () => reject(new Error('CANCEL_REMOVE_PROJECT'))
+      })
+    })
+
     await window.api.removeProjectSnapshot(projectId)
     projectStore.removeProject(projectId)
     assetStore.removeProjectAssets(projectId)
     reviewStore.removeProjectReviews(projectId)
     message.success('已从书架移除项目')
   } catch (error) {
+    if (error instanceof Error && error.message === 'CANCEL_REMOVE_PROJECT') {
+      return
+    }
     console.error(error)
     message.error('移除项目失败，请稍后重试')
   }
