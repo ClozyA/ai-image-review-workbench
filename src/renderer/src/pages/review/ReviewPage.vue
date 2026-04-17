@@ -20,7 +20,6 @@
       <section class="page-card review-card review-card-list">
         <div class="section-header">
           <h2>图片列表</h2>
-          <span class="section-tip">批量浏览与快速切换</span>
         </div>
         <div ref="thumbListRef" class="thumb-list" @scroll="handleThumbListScroll">
           <button
@@ -103,7 +102,7 @@
       <section class="page-card review-card review-card-panel">
         <div class="section-header">
           <h2>审核面板</h2>
-          <span class="section-tip">结论、分类、备注</span>
+
         </div>
 
         <div class="review-panel-body">

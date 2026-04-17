@@ -4,7 +4,9 @@
       <div>
         <div class="page-title-row">
           <h1 class="page-title">结果页</h1>
-          <a-tag v-if="currentProject?.name" color="blue">当前项目：{{ currentProject.name }}</a-tag>
+          <a-tag v-if="currentProject?.name" color="blue"
+            >当前项目：{{ currentProject.name }}</a-tag
+          >
         </div>
         <p class="page-subtitle">
           完整项目导出适合发给别人，JSON 备份可在当前电脑重新导入，CSV 更适合作为查看和流转记录。
@@ -24,69 +26,68 @@
       </a-space>
     </header>
 
-    <main class="page-section">
-      <section class="page-card">
+    <main class="page-section result-page-section">
+      <section class="page-card result-hero-card">
         <div class="section-header">
           <h2>结果概览</h2>
-          <span class="section-tip">来自统一的项目统计对象</span>
+          <span class="section-tip">当前项目的整体处理情况</span>
         </div>
 
-        <div class="summary-grid">
-          <article class="summary-card">
-            <span>总图片数</span>
-            <strong>{{ summary.totalCount }}</strong>
-          </article>
-          <article class="summary-card">
-            <span>已处理</span>
-            <strong>{{ summary.reviewedCount }}</strong>
-          </article>
-          <article class="summary-card">
-            <span>通过</span>
-            <strong>{{ summary.approvedCount }}</strong>
-          </article>
-          <article class="summary-card">
-            <span>待定</span>
-            <strong>{{ summary.pendingCount }}</strong>
-          </article>
+        <div class="result-hero-grid">
+          <a-card :bordered="false" class="result-progress-card">
+            <a-statistic title="完成进度" :value="progressPercent" suffix="%" />
+            <a-progress :percent="progressPercent" size="small" :show-info="false" />
+            <div class="result-progress-meta">{{ summary.reviewedCount }} / {{ summary.totalCount }} 已处理</div>
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="总图片数" :value="summary.totalCount" />
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="已处理" :value="summary.reviewedCount" />
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="通过" :value="summary.approvedCount" />
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="待定" :value="summary.pendingCount" />
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="淘汰" :value="summary.rejectedCount" />
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="收藏" :value="favoriteItems.length" />
+          </a-card>
+          <a-card :bordered="false" class="result-stat-card">
+            <a-statistic title="有备注" :value="summary.commentedCount" />
+          </a-card>
         </div>
       </section>
 
-      <section class="result-dashboard">
-        <article class="page-card">
-          <div class="section-header">
-            <h2>分类统计</h2>
-            <span class="section-tip">用于验证分类体系是否够用</span>
-          </div>
-          <ul class="info-list">
-            <li v-for="option in ASSET_CATEGORY_OPTIONS" :key="option.value">
-              {{ option.label }}：{{ summary.categoryCounts[option.value] }}
-            </li>
-          </ul>
-        </article>
-
-        <article class="page-card">
-          <div class="section-header">
-            <h2>备注概览</h2>
-            <span class="section-tip">后续可以扩展成导出摘要</span>
-          </div>
-          <div class="result-list">
-            <article v-for="item in commentedItems" :key="item.asset.id" class="result-item">
-              <img
-                class="result-item-cover"
-                :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)"
-                alt=""
-                loading="lazy"
-              />
-              <div class="result-item-main">
-                <strong>{{ item.asset.fileName }}</strong>
-                <span>{{
-                  item.review.category ? categoryText(item.review.category) : '未分类'
-                }}</span>
-                <small>{{ item.review.comment }}</small>
-              </div>
-            </article>
-          </div>
-        </article>
+      <section class="page-card result-panel-card result-list-panel">
+        <div class="section-header">
+          <h2>图片结果</h2>
+        </div>
+        <div v-if="resultItems.length" class="result-list result-scroll-list">
+          <article v-for="item in resultItems" :key="item.asset.id" class="result-item">
+            <img
+              class="result-item-cover"
+              :src="getThumbnailSrc(item.asset.thumbnailPath, item.asset.filePath)"
+              alt=""
+              loading="lazy"
+            />
+            <div class="result-item-main">
+              <strong>{{ item.asset.fileName }}</strong>
+              <span>
+                {{ item.review.decision ? decisionText(item.review.decision) : '未处理' }} ·
+                {{ item.review.category ? categoryText(item.review.category) : '未分类' }}
+              </span>
+              <small>{{ item.review.comment || '无备注' }}</small>
+            </div>
+          </article>
+        </div>
+        <div v-else class="filter-empty-state">
+          <strong>暂无结果</strong>
+        </div>
       </section>
     </main>
   </div>
@@ -97,7 +98,7 @@ import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 
-import { ASSET_CATEGORY_OPTIONS, ASSET_CATEGORY_TEXT } from '@renderer/app/constants/review'
+import { ASSET_CATEGORY_TEXT, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
@@ -122,16 +123,21 @@ const exportingCsv = ref(false)
 
 const summary = computed(() => projectStore.currentSummary)
 const currentProject = computed(() => projectStore.currentProject)
+const progressPercent = computed(() => {
+  if (!summary.value.totalCount) return 0
+  return Math.round((summary.value.reviewedCount / summary.value.totalCount) * 100)
+})
 
-const commentedItems = computed(() =>
+const resultItems = computed(() =>
   assetStore.assets
     .filter((asset) => asset.projectId === projectStore.currentProjectId)
     .map((asset) => ({
       asset,
       review: reviewStore.getReviewByAssetId(asset.id)!
     }))
-    .filter((item) => item.review.comment.trim())
 )
+
+const favoriteItems = computed(() => resultItems.value.filter((item) => item.review.favorite))
 
 watchEffect(() => {
   const routeProjectId = String(route.params.projectId || '')
@@ -170,6 +176,10 @@ function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
 
 function categoryText(category: AssetCategory): string {
   return ASSET_CATEGORY_TEXT[category]
+}
+
+function decisionText(decision: keyof typeof REVIEW_DECISION_TEXT): string {
+  return REVIEW_DECISION_TEXT[decision]
 }
 
 async function exportProjectResults(format: ExportFormat): Promise<void> {

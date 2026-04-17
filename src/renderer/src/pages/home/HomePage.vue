@@ -15,7 +15,6 @@
       <section class="page-card home-shelf-card">
         <div class="section-header">
           <h2>项目书架</h2>
-          <span class="section-tip">点击项目进入审核，书架内容可滚动</span>
         </div>
 
         <div class="project-shelf-scroll">
@@ -29,7 +28,6 @@
             <article class="project-tile project-tile-favorites" @click="goFavorites">
               <div class="project-tile-mark project-tile-mark-favorite">★</div>
               <strong>收藏夹</strong>
-              <span>{{ favoriteCount }} 张已收藏图片</span>
             </article>
 
             <article
@@ -45,7 +43,6 @@
                   loading="lazy"
                 />
                 <strong>{{ project.name }}</strong>
-                <span>{{ project.assetCount }} 张图片</span>
                 <span class="section-tip">最近打开：{{ formatDate(project.lastOpenedAt) }}</span>
               </div>
               <a-space wrap>

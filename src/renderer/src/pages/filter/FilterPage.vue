@@ -4,7 +4,9 @@
       <div>
         <div class="page-title-row">
           <h1 class="page-title">结果筛选</h1>
-          <a-tag v-if="currentProject?.name" color="blue">当前项目：{{ currentProject.name }}</a-tag>
+          <a-tag v-if="currentProject?.name" color="blue"
+            >当前项目：{{ currentProject.name }}</a-tag
+          >
         </div>
       </div>
       <a-space>

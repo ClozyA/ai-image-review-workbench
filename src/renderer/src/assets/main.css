@@ -205,8 +205,118 @@ body {
   min-height: 0;
 }
 
+.result-page-section {
+  grid-template-rows: auto minmax(0, 1fr);
+  height: calc(100vh - 140px);
+  min-height: 0;
+}
+
 .result-dashboard {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.result-hero-card,
+.result-panel-card {
+  min-height: 0;
+}
+
+.result-list-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.result-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.4fr) repeat(7, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.result-progress-card,
+.result-stat-card {
+  border-radius: 18px;
+  box-shadow: none;
+  background: #fff;
+}
+
+.result-progress-card .ant-card-body,
+.result-stat-card .ant-card-body {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.result-progress-meta {
+  color: #6f7d97;
+  font-size: 13px;
+}
+
+.result-stat-card .ant-statistic {
+  min-height: 92px;
+}
+
+.result-stat-card .ant-statistic-content,
+.result-progress-card .ant-statistic-content {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.result-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.result-kpi-card,
+.result-category-item {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(22, 39, 69, 0.08);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.result-kpi-card span,
+.result-category-item span {
+  color: #6f7d97;
+  font-size: 13px;
+}
+
+.result-kpi-card strong,
+.result-category-item strong {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2a44;
+}
+
+.result-kpi-approved {
+  background: linear-gradient(180deg, rgba(42, 181, 125, 0.1) 0%, #ffffff 100%);
+}
+
+.result-kpi-pending {
+  background: linear-gradient(180deg, rgba(247, 181, 0, 0.1) 0%, #ffffff 100%);
+}
+
+.result-kpi-rejected {
+  background: linear-gradient(180deg, rgba(255, 77, 79, 0.1) 0%, #ffffff 100%);
+}
+
+.result-category-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.result-scroll-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  align-content: start;
+  grid-auto-rows: max-content;
+  max-height: none;
 }
 
 .project-context-card {
@@ -697,6 +807,9 @@ body {
   .summary-grid,
   .home-summary-grid,
   .project-context-grid,
+  .result-hero-grid,
+  .result-kpi-grid,
+  .result-category-list,
   .result-list,
   .meta-grid,
   .compare-selector-list,
