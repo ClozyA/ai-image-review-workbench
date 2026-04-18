@@ -183,7 +183,6 @@ watch(categoryProjectId, (projectId) => {
 function goReview(projectId: string): void {
   projectStore.selectProject(projectId)
   const uiState = projectStore.getProjectUiState(projectId)
-  const targetRoute = uiState.lastRoute ?? 'review'
   if (uiState.lastSelectedAssetId) {
     assetStore.selectAsset(uiState.lastSelectedAssetId)
   }
@@ -192,7 +191,7 @@ function goReview(projectId: string): void {
   } else {
     filterStore.replaceFilter({ ...DEFAULT_FILTER })
   }
-  router.push({ name: targetRoute, params: { projectId } })
+  router.push({ name: 'review', params: { projectId } })
 }
 
 function goFavorites(): void {
