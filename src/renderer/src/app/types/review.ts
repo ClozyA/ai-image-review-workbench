@@ -3,12 +3,13 @@ export type AssetId = string
 
 export type ReviewDecision = 'approved' | 'pending' | 'rejected' | 'unreviewed'
 
-export type AssetCategory = 'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'
+export type AssetCategory = string
 
 export interface ReviewProject {
   id: ProjectId
   name: string
   sourceFolder: string
+  categories: AssetCategory[]
   coverAssetId?: AssetId
   createdAt: string
   updatedAt: string
@@ -48,7 +49,7 @@ export interface ProjectSummary {
   pendingCount: number
   rejectedCount: number
   commentedCount: number
-  categoryCounts: Record<AssetCategory, number>
+  categoryCounts: Record<string, number>
 }
 
 export interface AssetViewModel {

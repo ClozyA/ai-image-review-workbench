@@ -1,12 +1,12 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
+import { normalizeCategoryName } from '@renderer/app/constants/review'
 import { mockReviews } from '@renderer/app/mocks/review.mock'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { buildProjectSnapshot } from '@renderer/app/utils/project-snapshot'
 import type {
-  AssetCategory,
   AssetId,
   AssetReview,
   ReviewDecision,
@@ -40,11 +40,11 @@ export const useReviewStore = defineStore('review', () => {
     void persistProject(target.projectId)
   }
 
-  function updateCategory(assetId: AssetId, category: AssetCategory): void {
+  function updateCategory(assetId: AssetId, category: string): void {
     const target = getReviewByAssetId(assetId)
     if (!target) return
     saveStatus.value = 'saving'
-    target.category = category
+    target.category = normalizeCategoryName(category)
     target.updatedAt = new Date().toISOString()
     saveStatus.value = 'saved'
     refreshProjectSummary(target.projectId)
@@ -79,6 +79,7 @@ export const useReviewStore = defineStore('review', () => {
       ...otherReviews,
       ...snapshot.reviews.map((review) => ({
         ...review,
+        category: normalizeCategoryName(review.category),
         favorite: Boolean(review.favorite)
       }))
     ]
@@ -90,6 +91,7 @@ export const useReviewStore = defineStore('review', () => {
     reviews.value = snapshots.flatMap((snapshot) =>
       snapshot.reviews.map((review) => ({
         ...review,
+        category: normalizeCategoryName(review.category),
         favorite: Boolean(review.favorite)
       }))
     )

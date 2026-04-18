@@ -5,6 +5,9 @@
         <h1 class="page-title">AI 图片筛选与评审工作台</h1>
       </div>
       <a-space>
+        <a-button :disabled="!projectStore.projects.length" @click="openCategoryConfig">
+          配置分类
+        </a-button>
         <a-button type="primary" :loading="opening" @click="openFolder">打开文件夹</a-button>
         <a-button :loading="importingBackup" @click="importLocalBackup">导入本地备份</a-button>
         <a-button :loading="importing" @click="importProjectBundle">导入完整项目</a-button>
@@ -71,6 +74,42 @@
     />
   </a-modal>
   <a-modal
+    v-model:open="categoryModalOpen"
+    title="配置分类"
+    ok-text="保存"
+    cancel-text="取消"
+    @ok="handleCategoryConfirm"
+    @cancel="handleCategoryCancel"
+  >
+    <a-space direction="vertical" style="width: 100%">
+      <a-select
+        v-model:value="categoryProjectId"
+        style="width: 100%"
+        placeholder="请选择项目"
+        :options="categoryProjectOptions"
+      />
+      <div class="field-block" style="margin-bottom: 0">
+        <label class="field-label">当前分类</label>
+        <a-space wrap>
+          <a-tag
+            v-for="category in editableCategories"
+            :key="category"
+            closable
+            @close.prevent="removeEditableCategory(category)"
+          >
+            {{ category }}
+          </a-tag>
+        </a-space>
+      </div>
+      <a-input
+        v-model:value="categoryInput"
+        placeholder="输入分类名称后回车"
+        :maxlength="20"
+        @pressEnter="addEditableCategory"
+      />
+    </a-space>
+  </a-modal>
+  <a-modal
     v-model:open="importConflictModalOpen"
     title="发现同名项目冲突"
     ok-text="确认"
@@ -94,15 +133,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 
-import { useProjectStore } from '@renderer/app/store/project.store'
+import { DEFAULT_FILTER, normalizeCategoryNames } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
-import { useReviewStore } from '@renderer/app/store/review.store'
-import { DEFAULT_FILTER } from '@renderer/app/constants/review'
 import { useFilterStore } from '@renderer/app/store/filter.store'
+import { useProjectStore } from '@renderer/app/store/project.store'
+import { useReviewStore } from '@renderer/app/store/review.store'
 import { toFileUrl } from '@renderer/app/utils/file'
 import { buildProjectSnapshot, mergeProjectSnapshots } from '@renderer/app/utils/project-snapshot'
 import type { ReviewProjectSnapshot } from '@renderer/app/types/review'
@@ -119,12 +158,27 @@ const importing = ref(false)
 const renameModalOpen = ref(false)
 const renameInput = ref('')
 const renamingProjectId = ref<string | null>(null)
+const categoryModalOpen = ref(false)
+const categoryProjectId = ref<string>('')
+const categoryInput = ref('')
+const editableCategories = ref<string[]>([])
 const importConflictModalOpen = ref(false)
 const importConflictMode = ref<'overwrite' | 'merge' | 'skip'>('merge')
 const pendingImportSnapshot = ref<ReviewProjectSnapshot | null>(null)
 const pendingImportType = ref<'backup' | 'bundle' | null>(null)
 
-const favoriteCount = computed(() => reviewStore.reviews.filter((review) => review.favorite).length)
+const categoryProjectOptions = computed(() =>
+  projectStore.projects.map((project) => ({
+    label: project.name,
+    value: project.id
+  }))
+)
+
+watch(categoryProjectId, (projectId) => {
+  const project = projectStore.projects.find((item) => item.id === projectId)
+  editableCategories.value = project ? [...project.categories] : []
+  categoryInput.value = ''
+})
 
 function goReview(projectId: string): void {
   projectStore.selectProject(projectId)
@@ -215,6 +269,17 @@ async function openFolder(): Promise<void> {
   } finally {
     opening.value = false
   }
+}
+
+function openCategoryConfig(): void {
+  const projectId = projectStore.currentProjectId || projectStore.projects[0]?.id
+  if (!projectId) return
+  const project = projectStore.projects.find((item) => item.id === projectId)
+  if (!project) return
+  categoryProjectId.value = projectId
+  editableCategories.value = [...project.categories]
+  categoryInput.value = ''
+  categoryModalOpen.value = true
 }
 
 async function importProjectBundle(): Promise<void> {
@@ -356,6 +421,77 @@ async function applyImportedSnapshot(snapshot: ReviewProjectSnapshot): Promise<v
     name: snapshot.uiState?.lastRoute ?? 'review',
     params: { projectId: snapshot.project.id }
   })
+}
+
+function addEditableCategory(): void {
+  const nextCategory = categoryInput.value.trim()
+  if (!nextCategory) return
+  editableCategories.value = normalizeCategoryNames([...editableCategories.value, nextCategory])
+  categoryInput.value = ''
+}
+
+function removeEditableCategory(category: string): void {
+  editableCategories.value = editableCategories.value.filter((item) => item !== category)
+}
+
+async function handleCategoryConfirm(): Promise<void> {
+  const projectId = categoryProjectId.value
+  if (!projectId) {
+    message.warning('请先选择项目')
+    return
+  }
+
+  const project = projectStore.projects.find((item) => item.id === projectId)
+  if (!project) return
+
+  const nextCategories = normalizeCategoryNames(editableCategories.value)
+  if (!nextCategories.length) {
+    message.warning('至少保留一个分类')
+    return
+  }
+
+  try {
+    project.categories = nextCategories
+    project.updatedAt = new Date().toISOString()
+
+    reviewStore.reviews
+      .filter((review) => review.projectId === projectId && review.category)
+      .forEach((review) => {
+        if (!nextCategories.includes(review.category!)) {
+          review.category = undefined
+          review.updatedAt = new Date().toISOString()
+        }
+      })
+
+    projectStore.refreshSummary(
+      projectId,
+      assetStore.assets.filter((asset) => asset.projectId === projectId),
+      reviewStore.reviews.filter((review) => review.projectId === projectId)
+    )
+
+    const snapshot = buildProjectSnapshot(
+      {
+        ...project,
+        assetCount: assetStore.assets.filter((asset) => asset.projectId === projectId).length
+      },
+      assetStore.assets.filter((asset) => asset.projectId === projectId),
+      reviewStore.reviews.filter((review) => review.projectId === projectId),
+      projectStore.getProjectUiState(projectId)
+    )
+
+    if (!snapshot) return
+    await window.api.saveProjectSnapshot(snapshot)
+    categoryModalOpen.value = false
+    message.success('项目分类已更新')
+  } catch (error) {
+    console.error(error)
+    message.error('保存分类配置失败，请稍后重试')
+  }
+}
+
+function handleCategoryCancel(): void {
+  categoryModalOpen.value = false
+  categoryInput.value = ''
 }
 
 async function removeProject(projectId: string): Promise<void> {

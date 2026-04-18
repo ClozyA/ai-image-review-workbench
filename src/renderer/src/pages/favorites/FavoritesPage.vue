@@ -53,7 +53,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { ASSET_CATEGORY_TEXT, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
+import { getCategoryText, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
@@ -85,7 +85,7 @@ const favoriteItems = computed<FavoriteViewItem[]>(() =>
         projectId: asset.projectId,
         projectName: project.name,
         decisionText: REVIEW_DECISION_TEXT[review.decision],
-        categoryText: review.category ? ASSET_CATEGORY_TEXT[review.category] : '未分类'
+        categoryText: getCategoryText(review.category)
       }
     })
     .filter((item): item is FavoriteViewItem => item !== null)

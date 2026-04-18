@@ -1,4 +1,4 @@
-import { ASSET_CATEGORY_TEXT, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
+import { getCategoryText, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
 import type { ExportItem, ExportPayload } from '@renderer/app/types/export'
 import type {
   AssetReview,
@@ -17,13 +17,25 @@ export function buildProjectSnapshotForExport(
   if (!project) return null
 
   return {
-    project: { ...project },
+    project: {
+      ...project,
+      categories: [...project.categories]
+    },
     assets: assets.filter((asset) => asset.projectId === project.id).map((asset) => ({ ...asset })),
     reviews: reviews
       .filter((review) => review.projectId === project.id)
       .map((review) => ({ ...review })),
     uiState: uiState
-      ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined }
+      ? {
+          ...uiState,
+          filter: uiState.filter
+            ? {
+                ...uiState.filter,
+                decisions: [...uiState.filter.decisions],
+                categories: [...uiState.filter.categories]
+              }
+            : undefined
+        }
       : undefined
   }
 }
@@ -71,7 +83,7 @@ function buildExportItem(asset: ImageAsset, review?: AssetReview): ExportItem {
     decision: review?.decision ?? 'unreviewed',
     decisionText: REVIEW_DECISION_TEXT[review?.decision ?? 'unreviewed'],
     category: review?.category,
-    categoryText: review?.category ? ASSET_CATEGORY_TEXT[review.category] : '',
+    categoryText: review?.category ? getCategoryText(review.category) : '',
     favorite: review?.favorite ?? false,
     resolution: asset.width && asset.height ? `${asset.width} × ${asset.height}` : '',
     fileSize: asset.fileSize,

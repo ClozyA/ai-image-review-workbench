@@ -98,7 +98,7 @@ import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 
-import { ASSET_CATEGORY_TEXT, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
+import { getCategoryText, REVIEW_DECISION_TEXT } from '@renderer/app/constants/review'
 import { useAssetStore } from '@renderer/app/store/asset.store'
 import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
@@ -110,8 +110,6 @@ import {
 import { toFileUrl } from '@renderer/app/utils/file'
 import { persistProjectById } from '@renderer/app/utils/project-persist'
 import type { ExportFormat } from '@renderer/app/types/export'
-import type { AssetCategory } from '@renderer/app/types/review'
-
 const route = useRoute()
 const router = useRouter()
 const assetStore = useAssetStore()
@@ -174,8 +172,8 @@ function getThumbnailSrc(thumbnailPath?: string, filePath?: string): string {
   return toFileUrl(thumbnailPath || filePath)
 }
 
-function categoryText(category: AssetCategory): string {
-  return ASSET_CATEGORY_TEXT[category]
+function categoryText(category: string): string {
+  return getCategoryText(category)
 }
 
 function decisionText(decision: keyof typeof REVIEW_DECISION_TEXT): string {

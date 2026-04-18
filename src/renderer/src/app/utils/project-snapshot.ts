@@ -15,14 +15,12 @@ export function buildProjectSnapshot(
   if (!project) return null
 
   return {
-    project: { ...project },
+    project: cloneProject(project),
     assets: assets.filter((asset) => asset.projectId === project.id).map((asset) => ({ ...asset })),
     reviews: reviews
       .filter((review) => review.projectId === project.id)
       .map((review) => ({ ...review })),
-    uiState: uiState
-      ? { ...uiState, filter: uiState.filter ? { ...uiState.filter } : undefined }
-      : undefined
+    uiState: cloneUiState(uiState)
   }
 }
 
@@ -57,6 +55,9 @@ export function mergeProjectSnapshots(
     project: {
       ...existing.project,
       name: existing.project.name,
+      categories: Array.from(
+        new Set([...(existing.project.categories ?? []), ...(incoming.project.categories ?? [])])
+      ),
       coverAssetId: incoming.project.coverAssetId ?? existing.project.coverAssetId,
       assetCount: mergedAssets.length,
       updatedAt: now,
@@ -74,4 +75,26 @@ function pickNewerReview(left: AssetReview, right: AssetReview): AssetReview {
   if (Number.isNaN(leftTime)) return right
   if (Number.isNaN(rightTime)) return left
   return rightTime >= leftTime ? right : left
+}
+
+function cloneProject(project: ReviewProject): ReviewProject {
+  return {
+    ...project,
+    categories: [...project.categories]
+  }
+}
+
+function cloneUiState(uiState?: ProjectUiState): ProjectUiState | undefined {
+  if (!uiState) return undefined
+
+  return {
+    ...uiState,
+    filter: uiState.filter
+      ? {
+          ...uiState.filter,
+          decisions: [...uiState.filter.decisions],
+          categories: [...uiState.filter.categories]
+        }
+      : undefined
+  }
 }

@@ -148,7 +148,7 @@
             <label class="field-label">分类</label>
             <a-space wrap>
               <a-button
-                v-for="option in ASSET_CATEGORY_OPTIONS"
+                v-for="option in categoryOptions"
                 :key="option.value"
                 :type="currentReview?.category === option.value ? 'primary' : 'default'"
                 @click="updateCategory(option.value)"
@@ -257,8 +257,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 
 import {
-  ASSET_CATEGORY_OPTIONS,
-  ASSET_CATEGORY_TEXT,
+  buildCategoryOptions,
+  getCategoryText,
   REVIEW_DECISION_OPTIONS,
   REVIEW_DECISION_TEXT
 } from '@renderer/app/constants/review'
@@ -268,7 +268,7 @@ import { useProjectStore } from '@renderer/app/store/project.store'
 import { useReviewStore } from '@renderer/app/store/review.store'
 import { toFileUrl } from '@renderer/app/utils/file'
 import { persistProjectById } from '@renderer/app/utils/project-persist'
-import type { AssetCategory, AssetViewModel, ReviewDecision } from '@renderer/app/types/review'
+import type { AssetViewModel, ReviewDecision } from '@renderer/app/types/review'
 
 const route = useRoute()
 const router = useRouter()
@@ -287,6 +287,10 @@ const projectAssets = computed(() =>
   assetStore.assets.filter((asset) => asset.projectId === projectStore.currentProjectId)
 )
 
+const categoryOptions = computed(() =>
+  buildCategoryOptions(projectStore.currentProject?.categories)
+)
+
 const reviewItems = computed<AssetViewModel[]>(() =>
   projectAssets.value.map((asset) => {
     const review = reviewStore.getReviewByAssetId(asset.id)!
@@ -297,7 +301,7 @@ const reviewItems = computed<AssetViewModel[]>(() =>
       resolutionText: asset.width && asset.height ? `${asset.width} × ${asset.height}` : '-',
       hasComment: Boolean(review.comment.trim()),
       decisionText: REVIEW_DECISION_TEXT[review.decision],
-      categoryText: review.category ? ASSET_CATEGORY_TEXT[review.category] : '未分类'
+      categoryText: getCategoryText(review.category)
     }
   })
 )
@@ -444,7 +448,7 @@ function updateDecision(value: ReviewDecision): void {
   reviewStore.updateDecision(assetStore.currentAssetId, value)
 }
 
-function updateCategory(value: AssetCategory): void {
+function updateCategory(value: string): void {
   if (!assetStore.currentAssetId) return
   reviewStore.updateCategory(assetStore.currentAssetId, value)
 }

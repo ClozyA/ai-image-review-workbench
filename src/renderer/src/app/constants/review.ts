@@ -17,19 +17,43 @@ export const REVIEW_DECISION_TEXT: Record<ReviewDecision, string> = {
   unreviewed: '未处理'
 }
 
-export const ASSET_CATEGORY_OPTIONS = [
-  { label: 'AI 生成图', value: 'ai-generated' },
-  { label: '设计稿截图', value: 'design-screenshot' },
-  { label: '活动素材', value: 'campaign-material' },
-  { label: '参考图', value: 'reference' }
-] as const
+export const DEFAULT_PROJECT_CATEGORIES = ['AI 生成图', '设计稿截图', '活动素材', '参考图'] as const
 
-export const ASSET_CATEGORY_TEXT = {
+export const LEGACY_CATEGORY_TEXT_MAP: Record<string, string> = {
   'ai-generated': 'AI 生成图',
   'design-screenshot': '设计稿截图',
   'campaign-material': '活动素材',
   reference: '参考图'
-} as const
+}
+
+export function normalizeCategoryName(value?: string): string | undefined {
+  if (!value) return undefined
+  const normalized = LEGACY_CATEGORY_TEXT_MAP[value] ?? value
+  const trimmed = normalized.trim()
+  return trimmed || undefined
+}
+
+export function normalizeCategoryNames(values?: string[]): string[] {
+  const source = values?.length ? values : [...DEFAULT_PROJECT_CATEGORIES]
+  return Array.from(
+    new Set(
+      source
+        .map((value) => normalizeCategoryName(value))
+        .filter((value): value is string => Boolean(value))
+    )
+  )
+}
+
+export function buildCategoryOptions(categories?: string[]): Array<{ label: string; value: string }> {
+  return normalizeCategoryNames(categories).map((category) => ({
+    label: category,
+    value: category
+  }))
+}
+
+export function getCategoryText(category?: string): string {
+  return normalizeCategoryName(category) ?? '未分类'
+}
 
 export const EMPTY_PROJECT_SUMMARY: ProjectSummary = {
   totalCount: 0,
@@ -38,12 +62,7 @@ export const EMPTY_PROJECT_SUMMARY: ProjectSummary = {
   pendingCount: 0,
   rejectedCount: 0,
   commentedCount: 0,
-  categoryCounts: {
-    'ai-generated': 0,
-    'design-screenshot': 0,
-    'campaign-material': 0,
-    reference: 0
-  }
+  categoryCounts: {}
 }
 
 export const DEFAULT_FILTER: ReviewFilter = {

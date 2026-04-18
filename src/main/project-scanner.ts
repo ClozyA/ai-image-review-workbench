@@ -6,7 +6,8 @@ import { randomUUID } from 'crypto'
 type ProjectId = string
 type AssetId = string
 type ReviewDecision = 'approved' | 'pending' | 'rejected' | 'unreviewed'
-type AssetCategory = 'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'
+type AssetCategory = string
+const DEFAULT_PROJECT_CATEGORIES = ['AI 生成图', '设计稿截图', '活动素材', '参考图'] as const
 type ProjectUiState = {
   lastRoute?: 'review' | 'filter' | 'result'
   lastSelectedAssetId?: AssetId
@@ -25,6 +26,7 @@ export interface ReviewProjectSnapshot {
     id: ProjectId
     name: string
     sourceFolder: string
+    categories: AssetCategory[]
     coverAssetId?: AssetId
     createdAt: string
     updatedAt: string
@@ -120,6 +122,7 @@ export async function createProjectSnapshotFromFolder(
       id: projectId,
       name: basename(folderPath),
       sourceFolder: folderPath,
+      categories: [...DEFAULT_PROJECT_CATEGORIES],
       coverAssetId: assets[0]?.id,
       createdAt: now,
       updatedAt: now,

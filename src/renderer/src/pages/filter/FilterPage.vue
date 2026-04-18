@@ -41,7 +41,7 @@
           <label class="field-label">分类</label>
           <a-space wrap>
             <a-button
-              v-for="option in ASSET_CATEGORY_OPTIONS"
+              v-for="option in categoryOptions"
               :key="option.value"
               :type="filter.categories.includes(option.value) ? 'primary' : 'default'"
               @click="filterStore.toggleCategory(option.value)"
@@ -115,7 +115,7 @@
               <strong>{{ item.asset.fileName }}</strong>
               <span>
                 {{ REVIEW_DECISION_TEXT[item.review.decision] }} ·
-                {{ item.review.category ? ASSET_CATEGORY_TEXT[item.review.category] : '未分类' }}
+                {{ getCategoryText(item.review.category) }}
               </span>
               <small>{{ item.review.comment || '无备注' }}</small>
             </div>
@@ -135,8 +135,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 
 import {
-  ASSET_CATEGORY_OPTIONS,
-  ASSET_CATEGORY_TEXT,
+  buildCategoryOptions,
+  getCategoryText,
   REVIEW_DECISION_OPTIONS,
   REVIEW_DECISION_TEXT
 } from '@renderer/app/constants/review'
@@ -167,6 +167,7 @@ let filterScrollSaveTimer: ReturnType<typeof setTimeout> | undefined
 
 const filter = computed(() => filterStore.filter)
 const currentProject = computed(() => projectStore.currentProject)
+const categoryOptions = computed(() => buildCategoryOptions(currentProject.value?.categories))
 
 const projectItems = computed<AssetViewModel[]>(() =>
   assetStore.assets
@@ -319,7 +320,7 @@ function buildFilterDescription(): string {
   }
   if (filter.value.categories.length) {
     parts.push(
-      `分类：${filter.value.categories.map((value) => ASSET_CATEGORY_TEXT[value]).join('、')}`
+      `分类：${filter.value.categories.map((value) => getCategoryText(value)).join('、')}`
     )
   }
   if (filter.value.hasComment === true) {

@@ -6,6 +6,7 @@ interface ReviewProjectSnapshot {
     id: string
     name: string
     sourceFolder: string
+    categories: string[]
     coverAssetId?: string
     createdAt: string
     updatedAt: string
@@ -29,7 +30,7 @@ interface ReviewProjectSnapshot {
     assetId: string
     projectId: string
     decision: 'approved' | 'pending' | 'rejected' | 'unreviewed'
-    category?: 'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'
+    category?: string
     favorite: boolean
     comment: string
     reviewedAt?: string
@@ -42,7 +43,7 @@ interface ReviewProjectSnapshot {
     filterResultScrollTop?: number
     filter?: {
       decisions: Array<'approved' | 'pending' | 'rejected' | 'unreviewed'>
-      categories: Array<'ai-generated' | 'design-screenshot' | 'campaign-material' | 'reference'>
+      categories: string[]
       hasComment?: boolean
       keyword: string
     }

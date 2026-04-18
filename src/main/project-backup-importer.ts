@@ -5,6 +5,14 @@ import { dirname } from 'path'
 import { hydrateSnapshotThumbnails, type ReviewProjectSnapshot } from './project-scanner'
 import { ExportPayload } from './export-service'
 
+const DEFAULT_PROJECT_CATEGORIES = ['AI 生成图', '设计稿截图', '活动素材', '参考图'] as const
+const LEGACY_CATEGORY_TEXT_MAP: Record<string, string> = {
+  'ai-generated': 'AI 生成图',
+  'design-screenshot': '设计稿截图',
+  'campaign-material': '活动素材',
+  reference: '参考图'
+}
+
 export async function importLocalBackupJson(
   thumbnailBaseDir: string
 ): Promise<ReviewProjectSnapshot | null> {
@@ -73,6 +81,11 @@ export async function importLocalBackupJson(
       id: payload.projectId,
       name: payload.projectName,
       sourceFolder: dirname(resolvedAssets[0].filePath),
+      categories: normalizeCategoryNames(
+        payload.items
+          .map((item) => item.category)
+          .filter((item): item is string => typeof item === 'string')
+      ),
       coverAssetId: resolvedAssets[0]?.id,
       createdAt: payload.exportedAt,
       updatedAt: new Date().toISOString(),
@@ -124,15 +137,10 @@ function normalizeDecision(value: string): ReviewProjectSnapshot['reviews'][numb
 function normalizeCategory(
   value?: string
 ): ReviewProjectSnapshot['reviews'][number]['category'] | undefined {
-  if (
-    value === 'ai-generated' ||
-    value === 'design-screenshot' ||
-    value === 'campaign-material' ||
-    value === 'reference'
-  ) {
-    return value
-  }
-  return undefined
+  if (!value) return undefined
+  const normalized = LEGACY_CATEGORY_TEXT_MAP[value] ?? value
+  const trimmed = normalized.trim()
+  return trimmed || undefined
 }
 
 function normalizeUiState(
@@ -161,4 +169,15 @@ function normalizeUiState(
         }
       : undefined
   }
+}
+
+function normalizeCategoryNames(values?: string[]): string[] {
+  const source = values?.length ? values : [...DEFAULT_PROJECT_CATEGORIES]
+  return Array.from(
+    new Set(
+      source
+        .map((value) => normalizeCategory(value))
+        .filter((value): value is string => Boolean(value))
+    )
+  )
 }

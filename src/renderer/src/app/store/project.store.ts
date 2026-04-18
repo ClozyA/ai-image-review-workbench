@@ -1,10 +1,9 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import { EMPTY_PROJECT_SUMMARY } from '@renderer/app/constants/review'
+import { EMPTY_PROJECT_SUMMARY, normalizeCategoryNames } from '@renderer/app/constants/review'
 import { mockAssets, mockProjects, mockReviews } from '@renderer/app/mocks/review.mock'
 import type {
-  AssetCategory,
   AssetReview,
   ImageAsset,
   ProjectId,
@@ -28,7 +27,10 @@ function buildSummary(projectAssets: ImageAsset[], projectReviews: AssetReview[]
     if (review.decision === 'pending') summary.pendingCount += 1
     if (review.decision === 'rejected') summary.rejectedCount += 1
     if (review.comment.trim()) summary.commentedCount += 1
-    if (review.category) summary.categoryCounts[review.category as AssetCategory] += 1
+    if (review.category) {
+      const categoryName = review.category.trim()
+      summary.categoryCounts[categoryName] = (summary.categoryCounts[categoryName] ?? 0) + 1
+    }
   }
 
   return summary
@@ -88,11 +90,15 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   function upsertProject(snapshot: ReviewProjectSnapshot): void {
+    const normalizedProject = {
+      ...snapshot.project,
+      categories: normalizeCategoryNames(snapshot.project.categories)
+    }
     const index = projects.value.findIndex((project) => project.id === snapshot.project.id)
     if (index >= 0) {
-      projects.value[index] = snapshot.project
+      projects.value[index] = normalizedProject
     } else {
-      projects.value = [snapshot.project, ...projects.value]
+      projects.value = [normalizedProject, ...projects.value]
     }
     currentProjectId.value = snapshot.project.id
     updateUiState(snapshot.project.id, snapshot.uiState ?? {})
@@ -100,7 +106,10 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   function replaceBySnapshots(snapshots: ReviewProjectSnapshot[]): void {
-    projects.value = snapshots.map((snapshot) => snapshot.project)
+    projects.value = snapshots.map((snapshot) => ({
+      ...snapshot.project,
+      categories: normalizeCategoryNames(snapshot.project.categories)
+    }))
     summaries.value = Object.fromEntries(
       snapshots.map((snapshot) => [
         snapshot.project.id,
